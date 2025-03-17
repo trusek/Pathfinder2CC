@@ -24,7 +24,14 @@ export const basicInfoTemplate = `
                         <option value="goblin">Goblin</option>
                         <option value="halfling">Halfling</option>
                         <option value="human">Human</option>
-                        <!-- Add more ancestries as needed -->
+                        <option value="half-elf">Half-Elf</option>
+                        <option value="half-orc">Half-Orc</option>
+                        <option value="hobgoblin">Hobgoblin</option>
+                        <option value="leshy">Leshy</option>
+                        <option value="lizardfolk">Lizardfolk</option>
+                        <option value="orc">Orc</option>
+                        <option value="ratfolk">Ratfolk</option>
+                        <option value="tengu">Tengu</option>
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -32,11 +39,29 @@ export const basicInfoTemplate = `
                     <select class="form-control" name="background">
                         <option value="">Select Background</option>
                         <option value="acolyte">Acolyte</option>
+                        <option value="acrobat">Acrobat</option>
+                        <option value="animal whisperer">Animal Whisperer</option>
                         <option value="artisan">Artisan</option>
+                        <option value="artist">Artist</option>
+                        <option value="barkeep">Barkeep</option>
+                        <option value="bounty hunter">Bounty Hunter</option>
+                        <option value="criminal">Criminal</option>
+                        <option value="detective">Detective</option>
                         <option value="entertainer">Entertainer</option>
+                        <option value="farmhand">Farmhand</option>
+                        <option value="gladiator">Gladiator</option>
+                        <option value="guard">Guard</option>
+                        <option value="herbalist">Herbalist</option>
+                        <option value="hermit">Hermit</option>
+                        <option value="hunter">Hunter</option>
+                        <option value="laborer">Laborer</option>
                         <option value="merchant">Merchant</option>
+                        <option value="noble">Noble</option>
+                        <option value="nomad">Nomad</option>
                         <option value="scholar">Scholar</option>
-                        <!-- Add more backgrounds as needed -->
+                        <option value="scout">Scout</option>
+                        <option value="street urchin">Street Urchin</option>
+                        <option value="warrior">Warrior</option>
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -50,12 +75,19 @@ export const basicInfoTemplate = `
                         <option value="cleric">Cleric</option>
                         <option value="druid">Druid</option>
                         <option value="fighter">Fighter</option>
+                        <option value="gunslinger">Gunslinger</option>
+                        <option value="inventor">Inventor</option>
+                        <option value="investigator">Investigator</option>
+                        <option value="magus">Magus</option>
                         <option value="monk">Monk</option>
+                        <option value="oracle">Oracle</option>
                         <option value="ranger">Ranger</option>
                         <option value="rogue">Rogue</option>
                         <option value="sorcerer">Sorcerer</option>
+                        <option value="summoner">Summoner</option>
+                        <option value="swashbuckler">Swashbuckler</option>
+                        <option value="witch">Witch</option>
                         <option value="wizard">Wizard</option>
-                        <!-- Add more classes as needed -->
                     </select>
                 </div>
             </div>
@@ -179,88 +211,100 @@ export const basicInfoTemplate = `
             </div>
 
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label">Level</label>
                     <input type="number" class="form-control" name="level" value="1" min="1" max="20">
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Experience Points</label>
+                    <input type="number" class="form-control" name="xp" value="0" min="0">
+                </div>
+                <div class="col-md-4 mb-3">
                     <label class="form-label">Hero Points</label>
-                    <input type="number" class="form-control" name="heroPoints" value="0" min="0" max="3">
+                    <input type="number" class="form-control" name="heroPoints" value="1" min="0" max="3">
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <label class="form-label">Experience Points (XP)</label>
-                    <input type="number" class="form-control" name="experiencePoints" value="0" min="0">
-                </div>
-            </div>
-        </div>
-
-        <div class="form-section">
             <h3 class="section-title">Ability Scores</h3>
-            <div class="row">
-                <div class="col-md-4 col-6 mb-3">
-                    <label class="form-label">Strength</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control base-ability" name="strength" value="10" data-ability="strength">
-                        <input type="number" class="form-control ancestry-bonus" readonly data-ability="strength" value="0">
-                        <input type="number" class="form-control background-bonus" readonly data-ability="strength" value="0">
-                        <input type="number" class="form-control class-bonus" readonly data-ability="strength" value="0">
-                        <input type="number" class="form-control total-ability" readonly data-ability="strength" value="10">
-                    </div>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Ability</th>
+                            <th>Base Score</th>
+                            <th>Ancestry</th>
+                            <th>Background</th>
+                            <th>Class</th>
+                            <th class="fw-bold">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Strength</td>
+                            <td><input type="number" class="form-control form-control-sm" name="strength_score" value="10" min="1"></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="strength_ancestry_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="strength_background_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="strength_class_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm fw-bold" name="strength_total" value="10" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Dexterity</td>
+                            <td><input type="number" class="form-control form-control-sm" name="dexterity_score" value="10" min="1"></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="dexterity_ancestry_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="dexterity_background_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="dexterity_class_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm fw-bold" name="dexterity_total" value="10" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Constitution</td>
+                            <td><input type="number" class="form-control form-control-sm" name="constitution_score" value="10" min="1"></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="constitution_ancestry_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="constitution_background_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="constitution_class_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm fw-bold" name="constitution_total" value="10" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Intelligence</td>
+                            <td><input type="number" class="form-control form-control-sm" name="intelligence_score" value="10" min="1"></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="intelligence_ancestry_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="intelligence_background_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="intelligence_class_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm fw-bold" name="intelligence_total" value="10" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Wisdom</td>
+                            <td><input type="number" class="form-control form-control-sm" name="wisdom_score" value="10" min="1"></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="wisdom_ancestry_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="wisdom_background_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="wisdom_class_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm fw-bold" name="wisdom_total" value="10" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Charisma</td>
+                            <td><input type="number" class="form-control form-control-sm" name="charisma_score" value="10" min="1"></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="charisma_ancestry_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="charisma_background_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" name="charisma_class_bonus" value="0" readonly></td>
+                            <td><input type="number" class="form-control form-control-sm fw-bold" name="charisma_total" value="10" readonly></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="totalPointsWarning" class="alert alert-danger d-none">
+                    Total ability scores cannot exceed 80 points at level 1
                 </div>
-                <div class="col-md-4 col-6 mb-3">
-                    <label class="form-label">Dexterity</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control base-ability" name="dexterity" value="10" data-ability="dexterity">
-                        <input type="number" class="form-control ancestry-bonus" readonly data-ability="dexterity" value="0">
-                        <input type="number" class="form-control background-bonus" readonly data-ability="dexterity" value="0">
-                        <input type="number" class="form-control class-bonus" readonly data-ability="dexterity" value="0">
-                        <input type="number" class="form-control total-ability" readonly data-ability="dexterity" value="10">
-                    </div>
-                </div>
-                <div class="col-md-4 col-6 mb-3">
-                    <label class="form-label">Constitution</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control base-ability" name="constitution" value="10" data-ability="constitution">
-                        <input type="number" class="form-control ancestry-bonus" readonly data-ability="constitution" value="0">
-                        <input type="number" class="form-control background-bonus" readonly data-ability="constitution" value="0">
-                        <input type="number" class="form-control class-bonus" readonly data-ability="constitution" value="0">
-                        <input type="number" class="form-control total-ability" readonly data-ability="constitution" value="10">
-                    </div>
-                </div>
-                <div class="col-md-4 col-6 mb-3">
-                    <label class="form-label">Intelligence</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control base-ability" name="intelligence" value="10" data-ability="intelligence">
-                        <input type="number" class="form-control ancestry-bonus" readonly data-ability="intelligence" value="0">
-                        <input type="number" class="form-control background-bonus" readonly data-ability="intelligence" value="0">
-                        <input type="number" class="form-control class-bonus" readonly data-ability="intelligence" value="0">
-                        <input type="number" class="form-control total-ability" readonly data-ability="intelligence" value="10">
-                    </div>
-                </div>
-                <div class="col-md-4 col-6 mb-3">
-                    <label class="form-label">Wisdom</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control base-ability" name="wisdom" value="10" data-ability="wisdom">
-                        <input type="number" class="form-control ancestry-bonus" readonly data-ability="wisdom" value="0">
-                        <input type="number" class="form-control background-bonus" readonly data-ability="wisdom" value="0">
-                        <input type="number" class="form-control class-bonus" readonly data-ability="wisdom" value="0">
-                        <input type="number" class="form-control total-ability" readonly data-ability="wisdom" value="10">
-                    </div>
-                </div>
-                <div class="col-md-4 col-6 mb-3">
-                    <label class="form-label">Charisma</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control base-ability" name="charisma" value="10" data-ability="charisma">
-                        <input type="number" class="form-control ancestry-bonus" readonly data-ability="charisma" value="0">
-                        <input type="number" class="form-control background-bonus" readonly data-ability="charisma" value="0">
-                        <input type="number" class="form-control class-bonus" readonly data-ability="charisma" value="0">
-                        <input type="number" class="form-control total-ability" readonly data-ability="charisma" value="10">
-                    </div>
+                <div class="mt-2">
+                    <strong>Selected Traits:</strong> <span id="selectedTraits">None</span>
                 </div>
             </div>
+
+            <style>
+                .form-control-sm {
+                    min-height: calc(1.5em + 0.5rem + 2px);
+                    padding: 0.25rem 0.5rem;
+                    font-size: 0.875rem;
+                    border-radius: 0.2rem;
+                }
+            </style>
         </div>
     </div>
 `;

@@ -38,19 +38,104 @@ export class CharacterCalculator {
 
     updateAbilityScores() {
         const abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+        const BASE_ABILITY_POINTS = 80;
+        const POINTS_PER_LEVEL = 5;
         
+        // Get character level and calculate point limit
+        const level = parseInt(this.form.querySelector('[name="level"]')?.value) || 1;
+        const ABILITY_SCORE_LIMIT = BASE_ABILITY_POINTS + ((level - 1) * POINTS_PER_LEVEL);
+        
+        // Get selected ancestry, background and class
+        const ancestry = this.form.querySelector('[name="ancestry"]')?.value || '';
+        const background = this.form.querySelector('[name="background"]')?.value || '';
+        const characterClass = this.form.querySelector('[name="class"]')?.value || '';
+
+        // Get bonuses
+        const ancestryBonuses = this.getAncestryBonuses(ancestry);
+        const backgroundBonuses = this.getBackgroundBonuses(background);
+        const classBonuses = this.getClassBonuses(characterClass);
+        
+        // Calculate total score for all abilities
+        let totalScore = 0;
         abilities.forEach(ability => {
             const score = parseInt(this.form.querySelector(`[name="${ability}_score"]`)?.value) || 10;
-            const bonus = parseInt(this.form.querySelector(`[name="${ability}_bonus"]`)?.value) || 0;
-            const total = score + bonus;
-            const mod = Math.floor((total - 10) / 2);
+            totalScore += score;
+        });
+
+        // Show warning if total score exceeds limit
+        const warningElement = document.getElementById('totalPointsWarning');
+        if (warningElement) {
+            if (totalScore > ABILITY_SCORE_LIMIT) {
+                warningElement.textContent = `Total ability scores cannot exceed ${ABILITY_SCORE_LIMIT} points at level ${level}`;
+                warningElement.classList.remove('d-none');
+                return; // Don't update scores if limit is exceeded
+            } else {
+                warningElement.classList.add('d-none');
+            }
+        }
+        
+        // Update ability scores and bonuses
+        abilities.forEach(ability => {
+            const score = parseInt(this.form.querySelector(`[name="${ability}_score"]`)?.value) || 10;
+            const ancestryBonus = ancestryBonuses[ability] || 0;
+            const backgroundBonus = backgroundBonuses[ability] || 0;
+            const classBonus = classBonuses[ability] || 0;
             
-            if (this.form.querySelector(`[name="${ability}_mod"]`)) {
-                this.form.querySelector(`[name="${ability}_mod"]`).value = mod;
+            const total = score + ancestryBonus + backgroundBonus + classBonus;
+            
+            // Update ability total
+            if (this.form.querySelector(`[name="${ability}_total"]`)) {
+                this.form.querySelector(`[name="${ability}_total"]`).value = total;
+            }
+            
+            // Update bonus displays
+            if (this.form.querySelector(`[name="${ability}_ancestry_bonus"]`)) {
+                this.form.querySelector(`[name="${ability}_ancestry_bonus"]`).value = ancestryBonus;
+                this.form.querySelector(`[name="${ability}_ancestry_bonus"]`).classList.remove('text-success', 'text-danger', 'text-muted');
+                if (ancestryBonus > 0) {
+                    this.form.querySelector(`[name="${ability}_ancestry_bonus"]`).classList.add('text-success');
+                } else if (ancestryBonus < 0) {
+                    this.form.querySelector(`[name="${ability}_ancestry_bonus"]`).classList.add('text-danger');
+                } else {
+                    this.form.querySelector(`[name="${ability}_ancestry_bonus"]`).classList.add('text-muted');
+                }
+            }
+            if (this.form.querySelector(`[name="${ability}_background_bonus"]`)) {
+                this.form.querySelector(`[name="${ability}_background_bonus"]`).value = backgroundBonus;
+                this.form.querySelector(`[name="${ability}_background_bonus"]`).classList.remove('text-success', 'text-danger', 'text-muted');
+                if (backgroundBonus > 0) {
+                    this.form.querySelector(`[name="${ability}_background_bonus"]`).classList.add('text-success');
+                } else if (backgroundBonus < 0) {
+                    this.form.querySelector(`[name="${ability}_background_bonus"]`).classList.add('text-danger');
+                } else {
+                    this.form.querySelector(`[name="${ability}_background_bonus"]`).classList.add('text-muted');
+                }
+            }
+            if (this.form.querySelector(`[name="${ability}_class_bonus"]`)) {
+                this.form.querySelector(`[name="${ability}_class_bonus"]`).value = classBonus;
+                this.form.querySelector(`[name="${ability}_class_bonus"]`).classList.remove('text-success', 'text-danger', 'text-muted');
+                if (classBonus > 0) {
+                    this.form.querySelector(`[name="${ability}_class_bonus"]`).classList.add('text-success');
+                } else if (classBonus < 0) {
+                    this.form.querySelector(`[name="${ability}_class_bonus"]`).classList.add('text-danger');
+                } else {
+                    this.form.querySelector(`[name="${ability}_class_bonus"]`).classList.add('text-muted');
+                }
             }
         });
 
-        // Update dependent calculations
+        // Update traits display
+        const traits = [];
+        if (ancestry) traits.push(ancestry);
+        if (background) traits.push(background);
+        if (characterClass) traits.push(characterClass);
+        
+        const traitsElement = document.getElementById('selectedTraits');
+        if (traitsElement) {
+            traitsElement.textContent = traits.join(', ') || 'None';
+        }
+
+        // Update dependent calculations only if we're under the limit
         this.calculateAC();
         this.calculateSavingThrows();
         this.calculateSkills();
@@ -222,7 +307,15 @@ export class CharacterCalculator {
             gnome: { constitution: 2, charisma: 2, strength: -2 },
             goblin: { dexterity: 2, charisma: 2, wisdom: -2 },
             halfling: { dexterity: 2, wisdom: 2, strength: -2 },
-            human: { strength: 2 }
+            human: { strength: 2, dexterity: 2 },
+            'half-elf': { dexterity: 2, charisma: 2 },
+            'half-orc': { strength: 2, constitution: 2 },
+            hobgoblin: { constitution: 2, intelligence: 2 },
+            leshy: { constitution: 2, wisdom: 2, charisma: -2 },
+            lizardfolk: { strength: 2, wisdom: 2 },
+            orc: { strength: 2, constitution: 2, intelligence: -2 },
+            ratfolk: { dexterity: 2, intelligence: 2, strength: -2 },
+            tengu: { dexterity: 2, wisdom: 2 }
         };
         return bonuses[ancestry] || {};
     }
@@ -231,14 +324,28 @@ export class CharacterCalculator {
         console.log('Getting background bonuses for:', background);
         const bonuses = {
             acolyte: { intelligence: 2, wisdom: 2 },
+            acrobat: { strength: 2, dexterity: 2 },
+            'animal whisperer': { wisdom: 2, charisma: 2 },
             artisan: { strength: 2, intelligence: 2 },
+            artist: { dexterity: 2, charisma: 2 },
+            barkeep: { constitution: 2, charisma: 2 },
+            'bounty hunter': { strength: 2, wisdom: 2 },
+            criminal: { dexterity: 2, intelligence: 2 },
+            detective: { intelligence: 2, wisdom: 2 },
             entertainer: { dexterity: 2, charisma: 2 },
+            farmhand: { constitution: 2, wisdom: 2 },
+            gladiator: { strength: 2, charisma: 2 },
+            guard: { strength: 2, constitution: 2 },
+            herbalist: { constitution: 2, wisdom: 2 },
+            hermit: { constitution: 2, intelligence: 2 },
+            hunter: { dexterity: 2, wisdom: 2 },
             laborer: { strength: 2, constitution: 2 },
             merchant: { intelligence: 2, charisma: 2 },
             noble: { intelligence: 2, charisma: 2 },
             nomad: { constitution: 2, wisdom: 2 },
             scholar: { intelligence: 2, wisdom: 2 },
             scout: { dexterity: 2, wisdom: 2 },
+            'street urchin': { dexterity: 2, constitution: 2 },
             warrior: { strength: 2, constitution: 2 }
         };
         return bonuses[background] || {};
@@ -254,10 +361,18 @@ export class CharacterCalculator {
             cleric: { wisdom: 2 },
             druid: { wisdom: 2 },
             fighter: { strength: 2 },
+            gunslinger: { dexterity: 2 },
+            inventor: { intelligence: 2 },
+            investigator: { intelligence: 2 },
+            magus: { intelligence: 2 },
             monk: { dexterity: 2 },
+            oracle: { charisma: 2 },
             ranger: { dexterity: 2 },
             rogue: { dexterity: 2 },
             sorcerer: { charisma: 2 },
+            summoner: { charisma: 2 },
+            swashbuckler: { dexterity: 2 },
+            witch: { intelligence: 2 },
             wizard: { intelligence: 2 }
         };
         return bonuses[characterClass] || {};
