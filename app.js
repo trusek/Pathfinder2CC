@@ -1,219 +1,175 @@
+import { basicInfoTemplate, combatTemplate, skillsTemplate, featsTemplate } from './templates.js';
+import { FormHandler } from './formHandlers.js';
+import { CharacterCalculator } from './calculations.js';
+import { FeatsHandler } from './featsHandler.js';
+
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('characterForm');
+    // Initialize form content
+    const characterForm = document.getElementById('characterForm');
+    if (characterForm) {
+        characterForm.innerHTML = `
+            <div class="tab-content">
+                ${basicInfoTemplate}
+                ${combatTemplate}
+                ${skillsTemplate}
+                ${featsTemplate}
+                <div class="tab-pane fade" id="spells">
+                    <!-- Spells content will be added in next update -->
+                </div>
+                <div class="tab-pane fade" id="inventory">
+                    <!-- Inventory content will be added in next update -->
+                </div>
+                <div class="tab-pane fade" id="character">
+                    <!-- Character content will be added in next update -->
+                </div>
+            </div>
+        `;
+    }
+
+    // Initialize handlers
+    const formHandler = new FormHandler();
+    const calculator = new CharacterCalculator();
+    const featsHandler = new FeatsHandler();
+
+    // Make some functions globally available (needed for form handler)
+    window.updateAbilityScores = () => calculator.updateAbilityScores();
+    window.calculateAC = () => calculator.calculateAC();
+    window.calculateSavingThrows = () => calculator.calculateSavingThrows();
+    window.calculateSkills = () => calculator.calculateSkills();
+    window.addFeat = (type) => featsHandler.addFeat(type);
+    window.addFeature = () => featsHandler.addFeature();
+
+    // Initialize Bootstrap tabs
+    const triggerTabList = document.querySelectorAll('#characterTabs button');
+    triggerTabList.forEach(triggerEl => {
+        new bootstrap.Tab(triggerEl);
+    });
+
+    // Get form elements
     const saveBtn = document.getElementById('saveBtn');
     const loadBtn = document.getElementById('loadBtn');
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
     const importFile = document.getElementById('importFile');
 
-    // Ability score bonuses data
-    const ancestryBonuses = {
-        'Dwarf': { constitution: 2, wisdom: 2, charisma: -2 },
-        'Elf': { dexterity: 2, intelligence: 2, constitution: -2 },
-        'Gnome': { constitution: 2, charisma: 2, strength: -2 },
-        'Goblin': { dexterity: 2, charisma: 2, wisdom: -2 },
-        'Halfling': { dexterity: 2, wisdom: 2, strength: -2 },
-        'Human': { choice: 2 }, // Players can choose any ability score
-        'Half-Elf': { choice: 2 },
-        'Half-Orc': { choice: 2 },
-        'Hobgoblin': { constitution: 2, intelligence: 2 },
-        'Leshy': { constitution: 2, wisdom: 2, intelligence: -2 },
-        'Lizardfolk': { strength: 2, wisdom: 2 },
-        'Orc': { strength: 2, constitution: 2, intelligence: -2 },
-        'Ratfolk': { dexterity: 2, intelligence: 2, strength: -2 },
-        'Tengu': { dexterity: 2, charisma: 2 }
-    };
-
-    const backgroundBonuses = {
-        'Acolyte': { wisdom: 2, intelligence: 2 },
-        'Acrobat': { dexterity: 2, strength: 2 },
-        'Animal Whisperer': { wisdom: 2, charisma: 2 },
-        'Artisan': { strength: 2, intelligence: 2 },
-        'Artist': { dexterity: 2, charisma: 2 },
-        'Barkeep': { constitution: 2, charisma: 2 },
-        'Bounty Hunter': { strength: 2, wisdom: 2 },
-        'Criminal': { dexterity: 2, intelligence: 2 },
-        'Detective': { intelligence: 2, wisdom: 2 },
-        'Entertainer': { dexterity: 2, charisma: 2 },
-        'Farmhand': { constitution: 2, wisdom: 2 },
-        'Gladiator': { strength: 2, charisma: 2 },
-        'Guard': { strength: 2, constitution: 2 },
-        'Herbalist': { constitution: 2, wisdom: 2 },
-        'Hermit': { constitution: 2, intelligence: 2 },
-        'Hunter': { dexterity: 2, wisdom: 2 },
-        'Laborer': { strength: 2, constitution: 2 },
-        'Merchant': { intelligence: 2, charisma: 2 },
-        'Noble': { intelligence: 2, charisma: 2 },
-        'Nomad': { constitution: 2, wisdom: 2 },
-        'Scholar': { intelligence: 2, wisdom: 2 },
-        'Scout': { dexterity: 2, wisdom: 2 },
-        'Street Urchin': { dexterity: 2, constitution: 2 },
-        'Warrior': { strength: 2, constitution: 2 }
-    };
-
-    const classBonuses = {
-        'Alchemist': { intelligence: 2 },
-        'Barbarian': { strength: 2 },
-        'Bard': { charisma: 2 },
-        'Champion': { strength: 2 },
-        'Cleric': { wisdom: 2 },
-        'Druid': { wisdom: 2 },
-        'Fighter': { strength: 2 },
-        'Gunslinger': { dexterity: 2 },
-        'Inventor': { intelligence: 2 },
-        'Investigator': { intelligence: 2 },
-        'Magus': { intelligence: 2 },
-        'Monk': { dexterity: 2 },
-        'Oracle': { charisma: 2 },
-        'Ranger': { dexterity: 2 },
-        'Rogue': { dexterity: 2 },
-        'Sorcerer': { charisma: 2 },
-        'Summoner': { charisma: 2 },
-        'Swashbuckler': { dexterity: 2 },
-        'Witch': { intelligence: 2 },
-        'Wizard': { intelligence: 2 }
-    };
-
-    // Function to update ability scores
-    function updateAbilityScores() {
-        const ancestry = form.elements['ancestry'].value;
-        const background = form.elements['background'].value;
-        const characterClass = form.elements['class'].value;
-
-        // Reset all bonuses and remove color classes
-        document.querySelectorAll('.ancestry-bonus, .background-bonus, .class-bonus').forEach(input => {
-            input.value = 0;
-            input.classList.remove('bonus-positive', 'bonus-negative');
-        });
-
-        // Apply ancestry bonuses
-        if (ancestry && ancestryBonuses[ancestry]) {
-            Object.entries(ancestryBonuses[ancestry]).forEach(([ability, bonus]) => {
-                if (ability !== 'choice') {
-                    const bonusInput = document.querySelector(`.ancestry-bonus[data-ability="${ability}"]`);
-                    if (bonusInput) {
-                        bonusInput.value = bonus;
-                        if (bonus > 0) {
-                            bonusInput.classList.add('bonus-positive');
-                        } else if (bonus < 0) {
-                            bonusInput.classList.add('bonus-negative');
-                        }
-                    }
-                }
-            });
-        }
-
-        // Apply background bonuses
-        if (background && backgroundBonuses[background]) {
-            Object.entries(backgroundBonuses[background]).forEach(([ability, bonus]) => {
-                const bonusInput = document.querySelector(`.background-bonus[data-ability="${ability}"]`);
-                if (bonusInput) {
-                    bonusInput.value = bonus;
-                    if (bonus > 0) {
-                        bonusInput.classList.add('bonus-positive');
-                    } else if (bonus < 0) {
-                        bonusInput.classList.add('bonus-negative');
-                    }
-                }
-            });
-        }
-
-        // Apply class bonuses
-        if (characterClass && classBonuses[characterClass]) {
-            Object.entries(classBonuses[characterClass]).forEach(([ability, bonus]) => {
-                const bonusInput = document.querySelector(`.class-bonus[data-ability="${ability}"]`);
-                if (bonusInput) {
-                    bonusInput.value = bonus;
-                    if (bonus > 0) {
-                        bonusInput.classList.add('bonus-positive');
-                    } else if (bonus < 0) {
-                        bonusInput.classList.add('bonus-negative');
-                    }
-                }
-            });
-        }
-
-        // Update totals
-        document.querySelectorAll('.base-ability').forEach(baseInput => {
-            const ability = baseInput.dataset.ability;
-            const ancestryBonus = parseInt(document.querySelector(`.ancestry-bonus[data-ability="${ability}"]`).value) || 0;
-            const backgroundBonus = parseInt(document.querySelector(`.background-bonus[data-ability="${ability}"]`).value) || 0;
-            const classBonus = parseInt(document.querySelector(`.class-bonus[data-ability="${ability}"]`).value) || 0;
-            const total = parseInt(baseInput.value) + ancestryBonus + backgroundBonus + classBonus;
-            document.querySelector(`.total-ability[data-ability="${ability}"]`).value = total;
-        });
-    }
-
     // Add event listeners for ability score updates
-    form.elements['ancestry'].addEventListener('change', updateAbilityScores);
-    form.elements['background'].addEventListener('change', updateAbilityScores);
-    form.elements['class'].addEventListener('change', updateAbilityScores);
-    document.querySelectorAll('.base-ability').forEach(input => {
+    const baseAbilityInputs = document.querySelectorAll('.base-ability');
+    baseAbilityInputs.forEach(input => {
         input.addEventListener('change', updateAbilityScores);
     });
 
-    // Save character data to localStorage
-    saveBtn.addEventListener('click', () => {
-        const formData = new FormData(form);
-        const characterData = {};
-        formData.forEach((value, key) => {
-            characterData[key] = value;
-        });
-        
-        // Save ability score totals
-        document.querySelectorAll('.total-ability').forEach(input => {
-            characterData[`total_${input.dataset.ability}`] = input.value;
-        });
-        
-        localStorage.setItem('characterData', JSON.stringify(characterData));
-        alert('Character saved successfully!');
+    // Add event listeners for ancestry, background, and class selection
+    const ancestrySelect = document.querySelector('select[name="ancestry"]');
+    const backgroundSelect = document.querySelector('select[name="background"]');
+    const classSelect = document.querySelector('select[name="class"]');
+
+    ancestrySelect.addEventListener('change', updateAbilityScores);
+    backgroundSelect.addEventListener('change', updateAbilityScores);
+    classSelect.addEventListener('change', updateAbilityScores);
+
+    // Add event listeners for combat calculations
+    const baseACInput = document.querySelector('input[name="baseAC"]');
+    const dexCapInput = document.querySelector('input[name="dexCap"]');
+    const acItemBonusInput = document.querySelector('input[name="acItemBonus"]');
+    const totalACInput = document.querySelector('input[name="totalAC"]');
+
+    [baseACInput, dexCapInput, acItemBonusInput].forEach(input => {
+        input.addEventListener('change', calculateAC);
     });
 
-    // Load character data from localStorage
+    // Add event listeners for saving throw calculations
+    const savingThrowInputs = document.querySelectorAll('input[name$="Prof"], input[name$="Item"]');
+    savingThrowInputs.forEach(input => {
+        input.addEventListener('change', calculateSavingThrows);
+    });
+
+    // Add event listeners for skill calculations
+    const skillInputs = document.querySelectorAll('select[name$="Prof"], input[name$="Item"]');
+    skillInputs.forEach(input => {
+        input.addEventListener('change', calculateSkills);
+    });
+
+    // Add event listener for level changes
+    const levelInput = document.querySelector('input[name="level"]');
+    levelInput.addEventListener('change', () => {
+        calculateSkills();
+        calculateSavingThrows();
+    });
+
+    // Add event listeners for feat management
+    const addAncestryFeatBtn = document.getElementById('addAncestryFeat');
+    const addClassFeatBtn = document.getElementById('addClassFeat');
+    const addSkillFeatBtn = document.getElementById('addSkillFeat');
+    const addGeneralFeatBtn = document.getElementById('addGeneralFeat');
+    const addClassFeatureBtn = document.getElementById('addClassFeature');
+
+    addAncestryFeatBtn.addEventListener('click', () => addFeat('ancestry'));
+    addClassFeatBtn.addEventListener('click', () => addFeat('class'));
+    addSkillFeatBtn.addEventListener('click', () => addFeat('skill'));
+    addGeneralFeatBtn.addEventListener('click', () => addFeat('general'));
+    addClassFeatureBtn.addEventListener('click', () => addFeature());
+
+    // Save character data
+    saveBtn.addEventListener('click', () => {
+        const formData = new FormData(characterForm);
+        const characterData = Object.fromEntries(formData.entries());
+        const featsData = featsHandler.getFeatsData();
+        
+        const fullData = {
+            ...characterData,
+            feats: featsData
+        };
+        
+        localStorage.setItem('characterData', JSON.stringify(fullData));
+        alert('Character data saved!');
+    });
+
+    // Load character data
     loadBtn.addEventListener('click', () => {
         const savedData = localStorage.getItem('characterData');
         if (savedData) {
-            const characterData = JSON.parse(savedData);
-            Object.entries(characterData).forEach(([key, value]) => {
-                const input = form.elements[key];
+            const fullData = JSON.parse(savedData);
+            const { feats, ...characterData } = fullData;
+            
+            // Load basic character data
+            Object.entries(characterData).forEach(([name, value]) => {
+                const input = characterForm.querySelector(`[name="${name}"]`);
                 if (input) {
                     input.value = value;
                 }
             });
+            
+            // Load feats and features
+            if (feats) {
+                featsHandler.loadFeatsData(feats);
+            }
+            
             updateAbilityScores();
-            alert('Character loaded successfully!');
+            calculateAC();
+            calculateSavingThrows();
+            calculateSkills();
+            alert('Character data loaded!');
         } else {
-            alert('No saved character found!');
+            alert('No saved character data found.');
         }
     });
 
-    // Export character data to JSON file
+    // Export character data
     exportBtn.addEventListener('click', () => {
-        const formData = new FormData(form);
-        const characterData = {};
-        formData.forEach((value, key) => {
-            characterData[key] = value;
-        });
-        
-        // Export ability score totals
-        document.querySelectorAll('.total-ability').forEach(input => {
-            characterData[`total_${input.dataset.ability}`] = input.value;
-        });
-        
-        const dataStr = JSON.stringify(characterData, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${characterData.name || 'character'}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        const formData = new FormData(characterForm);
+        const characterData = Object.fromEntries(formData.entries());
+        const featsData = featsHandler.getFeatsData();
+        const dataStr = JSON.stringify({ ...characterData, feats: featsData }, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+        const exportFileDefaultName = 'character.json';
+
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
     });
 
-    // Import character data from JSON file
+    // Import character data
     importBtn.addEventListener('click', () => {
         importFile.click();
     });
@@ -224,33 +180,177 @@ document.addEventListener('DOMContentLoaded', () => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
-                    const characterData = JSON.parse(e.target.result);
-                    Object.entries(characterData).forEach(([key, value]) => {
-                        const input = form.elements[key];
+                    const fullData = JSON.parse(e.target.result);
+                    const { feats, ...characterData } = fullData;
+                    
+                    // Load basic character data
+                    Object.entries(characterData).forEach(([name, value]) => {
+                        const input = characterForm.querySelector(`[name="${name}"]`);
                         if (input) {
                             input.value = value;
                         }
                     });
+                    
+                    // Load feats and features
+                    if (feats) {
+                        featsHandler.loadFeatsData(feats);
+                    }
+                    
                     updateAbilityScores();
-                    alert('Character imported successfully!');
+                    calculateAC();
+                    calculateSavingThrows();
+                    calculateSkills();
+                    alert('Character data imported successfully!');
                 } catch (error) {
-                    alert('Error importing character data. Please check the file format.');
+                    alert('Error importing character data: Invalid JSON file');
                 }
             };
             reader.readAsText(file);
         }
     });
 
-    // Load any existing character data on page load
-    const savedData = localStorage.getItem('characterData');
-    if (savedData) {
-        const characterData = JSON.parse(savedData);
-        Object.entries(characterData).forEach(([key, value]) => {
-            const input = form.elements[key];
-            if (input) {
-                input.value = value;
-            }
+    // Function to update ability scores based on ancestry, background, and class
+    function updateAbilityScores() {
+        const abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+        const ancestry = ancestrySelect.value;
+        const background = backgroundSelect.value;
+        const characterClass = classSelect.value;
+
+        // Reset all bonuses
+        abilities.forEach(ability => {
+            document.querySelector(`[data-ability="${ability}"].ancestry-bonus`).value = 0;
+            document.querySelector(`[data-ability="${ability}"].background-bonus`).value = 0;
+            document.querySelector(`[data-ability="${ability}"].class-bonus`).value = 0;
         });
-        updateAbilityScores();
+
+        // Apply ancestry bonuses (example values)
+        if (ancestry) {
+            const ancestryBonuses = calculator.getAncestryBonuses(ancestry);
+            Object.entries(ancestryBonuses).forEach(([ability, bonus]) => {
+                const bonusInput = document.querySelector(`[data-ability="${ability}"].ancestry-bonus`);
+                if (bonusInput) {
+                    bonusInput.value = bonus;
+                    applyBonusStyle(bonusInput, bonus);
+                }
+            });
+        }
+
+        // Apply background bonuses (example values)
+        if (background) {
+            const backgroundBonuses = calculator.getBackgroundBonuses(background);
+            Object.entries(backgroundBonuses).forEach(([ability, bonus]) => {
+                const bonusInput = document.querySelector(`[data-ability="${ability}"].background-bonus`);
+                if (bonusInput) {
+                    bonusInput.value = bonus;
+                    applyBonusStyle(bonusInput, bonus);
+                }
+            });
+        }
+
+        // Apply class bonuses (example values)
+        if (characterClass) {
+            const classBonuses = calculator.getClassBonuses(characterClass);
+            Object.entries(classBonuses).forEach(([ability, bonus]) => {
+                const bonusInput = document.querySelector(`[data-ability="${ability}"].class-bonus`);
+                if (bonusInput) {
+                    bonusInput.value = bonus;
+                    applyBonusStyle(bonusInput, bonus);
+                }
+            });
+        }
+
+        // Calculate total scores
+        abilities.forEach(ability => {
+            const baseValue = parseInt(document.querySelector(`[data-ability="${ability}"].base-ability`).value) || 0;
+            const ancestryBonus = parseInt(document.querySelector(`[data-ability="${ability}"].ancestry-bonus`).value) || 0;
+            const backgroundBonus = parseInt(document.querySelector(`[data-ability="${ability}"].background-bonus`).value) || 0;
+            const classBonus = parseInt(document.querySelector(`[data-ability="${ability}"].class-bonus`).value) || 0;
+            const total = baseValue + ancestryBonus + backgroundBonus + classBonus;
+            
+            document.querySelector(`[data-ability="${ability}"].total-ability`).value = total;
+        });
+
+        // Recalculate dependent values
+        calculateAC();
+        calculateSavingThrows();
+        calculateSkills();
+    }
+
+    // Function to calculate Armor Class
+    function calculateAC() {
+        const baseAC = parseInt(baseACInput.value) || 10;
+        const dexMod = parseInt(document.querySelector('[data-ability="dexterity"].total-ability').value) || 0;
+        const dexCap = parseInt(dexCapInput.value) || 0;
+        const itemBonus = parseInt(acItemBonusInput.value) || 0;
+
+        const effectiveDexMod = dexCap > 0 ? Math.min(dexMod, dexCap) : dexMod;
+        const totalAC = baseAC + effectiveDexMod + itemBonus;
+
+        totalACInput.value = totalAC;
+    }
+
+    // Function to calculate Saving Throws
+    function calculateSavingThrows() {
+        const saves = ['fortitude', 'reflex', 'will'];
+        const abilityMods = {
+            fortitude: parseInt(document.querySelector('[data-ability="constitution"].total-ability').value) || 0,
+            reflex: parseInt(document.querySelector('[data-ability="dexterity"].total-ability').value) || 0,
+            will: parseInt(document.querySelector('[data-ability="wisdom"].total-ability').value) || 0
+        };
+
+        saves.forEach(save => {
+            const profBonus = parseInt(document.querySelector(`input[name="${save}Prof"]`).value) || 0;
+            const itemBonus = parseInt(document.querySelector(`input[name="${save}Item"]`).value) || 0;
+            const abilityMod = abilityMods[save];
+            
+            const total = profBonus + itemBonus + abilityMod;
+            document.querySelector(`input[name="${save}Total"]`).value = total;
+        });
+    }
+
+    // Function to calculate Skills
+    function calculateSkills() {
+        const skills = {
+            acrobatics: 'dexterity',
+            arcana: 'intelligence',
+            athletics: 'strength',
+            crafting: 'intelligence',
+            deception: 'charisma',
+            diplomacy: 'charisma',
+            intimidation: 'charisma',
+            medicine: 'wisdom',
+            nature: 'wisdom',
+            occultism: 'intelligence',
+            performance: 'charisma',
+            religion: 'wisdom',
+            society: 'intelligence',
+            stealth: 'dexterity',
+            survival: 'wisdom',
+            thievery: 'dexterity'
+        };
+
+        const level = parseInt(document.querySelector('input[name="level"]').value) || 0;
+
+        Object.entries(skills).forEach(([skill, ability]) => {
+            const profValue = parseInt(document.querySelector(`select[name="${skill}Prof"]`).value) || 0;
+            const itemBonus = parseInt(document.querySelector(`input[name="${skill}Item"]`).value) || 0;
+            const abilityMod = parseInt(document.querySelector(`[data-ability="${ability}"].total-ability`).value) || 0;
+            
+            // W Pathfinder 2E, bonus z biegłości to poziom postaci + wartość biegłości
+            const profBonus = profValue > 0 ? level + profValue : 0;
+            const total = profBonus + itemBonus + abilityMod;
+            
+            document.querySelector(`input[name="${skill}Total"]`).value = total;
+        });
+    }
+
+    // Helper function to apply bonus styling
+    function applyBonusStyle(element, value) {
+        element.classList.remove('bonus-positive', 'bonus-negative');
+        if (value > 0) {
+            element.classList.add('bonus-positive');
+        } else if (value < 0) {
+            element.classList.add('bonus-negative');
+        }
     }
 });

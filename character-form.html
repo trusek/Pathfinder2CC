@@ -1,0 +1,463 @@
+<form id="characterForm">
+    <div class="tab-content">
+        <!-- Basic Info Tab -->
+        <div class="tab-pane fade show active" id="basic">
+            <div class="form-section">
+                <h3 class="section-title">Basic Information</h3>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Character Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Player Name</label>
+                        <input type="text" class="form-control" name="playerName">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Ancestry</label>
+                        <select class="form-control" name="ancestry">
+                            <option value="">Select Ancestry</option>
+                            <option value="Dwarf">Dwarf</option>
+                            <option value="Elf">Elf</option>
+                            <option value="Gnome">Gnome</option>
+                            <option value="Goblin">Goblin</option>
+                            <option value="Halfling">Halfling</option>
+                            <option value="Human">Human</option>
+                            <option value="Half-Elf">Half-Elf</option>
+                            <option value="Half-Orc">Half-Orc</option>
+                            <option value="Hobgoblin">Hobgoblin</option>
+                            <option value="Leshy">Leshy</option>
+                            <option value="Lizardfolk">Lizardfolk</option>
+                            <option value="Orc">Orc</option>
+                            <option value="Ratfolk">Ratfolk</option>
+                            <option value="Tengu">Tengu</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Background</label>
+                        <select class="form-control" name="background">
+                            <option value="">Select Background</option>
+                            <option value="Acolyte">Acolyte</option>
+                            <option value="Acrobat">Acrobat</option>
+                            <option value="Animal Whisperer">Animal Whisperer</option>
+                            <option value="Artisan">Artisan</option>
+                            <option value="Artist">Artist</option>
+                            <option value="Barkeep">Barkeep</option>
+                            <option value="Barrister">Barrister</option>
+                            <option value="Bounty Hunter">Bounty Hunter</option>
+                            <option value="Criminal">Criminal</option>
+                            <option value="Detective">Detective</option>
+                            <option value="Entertainer">Entertainer</option>
+                            <option value="Farmhand">Farmhand</option>
+                            <option value="Field Medic">Field Medic</option>
+                            <option value="Fortune Teller">Fortune Teller</option>
+                            <option value="Gambler">Gambler</option>
+                            <option value="Gladiator">Gladiator</option>
+                            <option value="Guard">Guard</option>
+                            <option value="Herbalist">Herbalist</option>
+                            <option value="Hermit">Hermit</option>
+                            <option value="Hunter">Hunter</option>
+                            <option value="Laborer">Laborer</option>
+                            <option value="Merchant">Merchant</option>
+                            <option value="Miner">Miner</option>
+                            <option value="Noble">Noble</option>
+                            <option value="Nomad">Nomad</option>
+                            <option value="Sailor">Sailor</option>
+                            <option value="Scholar">Scholar</option>
+                            <option value="Scout">Scout</option>
+                            <option value="Street Urchin">Street Urchin</option>
+                            <option value="Warrior">Warrior</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Class</label>
+                        <select class="form-control" name="class">
+                            <option value="">Select Class</option>
+                            <option value="Alchemist">Alchemist</option>
+                            <option value="Barbarian">Barbarian</option>
+                            <option value="Bard">Bard</option>
+                            <option value="Champion">Champion</option>
+                            <option value="Cleric">Cleric</option>
+                            <option value="Druid">Druid</option>
+                            <option value="Fighter">Fighter</option>
+                            <option value="Monk">Monk</option>
+                            <option value="Oracle">Oracle</option>
+                            <option value="Ranger">Ranger</option>
+                            <option value="Rogue">Rogue</option>
+                            <option value="Sorcerer">Sorcerer</option>
+                            <option value="Swashbuckler">Swashbuckler</option>
+                            <option value="Witch">Witch</option>
+                            <option value="Wizard">Wizard</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Level</label>
+                        <input type="number" class="form-control" name="level" value="1" min="1" max="20">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Experience Points</label>
+                        <input type="number" class="form-control" name="xp" min="0">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Hero Points</label>
+                        <input type="number" class="form-control" name="heroPoints" min="0" max="3" value="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">Ability Scores</h3>
+                <div class="row">
+                    <div class="col-md-4 col-6 mb-3">
+                        <label class="form-label">Strength</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control base-ability" name="strength" value="10" data-ability="strength">
+                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="strength" value="0">
+                            <input type="number" class="form-control background-bonus" readonly data-ability="strength" value="0">
+                            <input type="number" class="form-control class-bonus" readonly data-ability="strength" value="0">
+                            <input type="number" class="form-control total-ability" readonly data-ability="strength" value="10">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6 mb-3">
+                        <label class="form-label">Dexterity</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control base-ability" name="dexterity" value="10" data-ability="dexterity">
+                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="dexterity" value="0">
+                            <input type="number" class="form-control background-bonus" readonly data-ability="dexterity" value="0">
+                            <input type="number" class="form-control class-bonus" readonly data-ability="dexterity" value="0">
+                            <input type="number" class="form-control total-ability" readonly data-ability="dexterity" value="10">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6 mb-3">
+                        <label class="form-label">Constitution</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control base-ability" name="constitution" value="10" data-ability="constitution">
+                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="constitution" value="0">
+                            <input type="number" class="form-control background-bonus" readonly data-ability="constitution" value="0">
+                            <input type="number" class="form-control class-bonus" readonly data-ability="constitution" value="0">
+                            <input type="number" class="form-control total-ability" readonly data-ability="constitution" value="10">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6 mb-3">
+                        <label class="form-label">Intelligence</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control base-ability" name="intelligence" value="10" data-ability="intelligence">
+                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="intelligence" value="0">
+                            <input type="number" class="form-control background-bonus" readonly data-ability="intelligence" value="0">
+                            <input type="number" class="form-control class-bonus" readonly data-ability="intelligence" value="0">
+                            <input type="number" class="form-control total-ability" readonly data-ability="intelligence" value="10">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6 mb-3">
+                        <label class="form-label">Wisdom</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control base-ability" name="wisdom" value="10" data-ability="wisdom">
+                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="wisdom" value="0">
+                            <input type="number" class="form-control background-bonus" readonly data-ability="wisdom" value="0">
+                            <input type="number" class="form-control class-bonus" readonly data-ability="wisdom" value="0">
+                            <input type="number" class="form-control total-ability" readonly data-ability="wisdom" value="10">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6 mb-3">
+                        <label class="form-label">Charisma</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control base-ability" name="charisma" value="10" data-ability="charisma">
+                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="charisma" value="0">
+                            <input type="number" class="form-control background-bonus" readonly data-ability="charisma" value="0">
+                            <input type="number" class="form-control class-bonus" readonly data-ability="charisma" value="0">
+                            <input type="number" class="form-control total-ability" readonly data-ability="charisma" value="10">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combat Tab -->
+        <div class="tab-pane fade" id="combat">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="armor-class-box">
+                        <h4>Armor Class</h4>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Base AC</label>
+                                <input type="number" class="form-control" name="baseAC" value="10">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Dex Cap</label>
+                                <input type="number" class="form-control" name="dexCap" value="0">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Item Bonus</label>
+                                <input type="number" class="form-control" name="acItemBonus" value="0">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Total AC</label>
+                                <input type="number" class="form-control" name="totalAC" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="hit-points-box">
+                        <h4>Hit Points</h4>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Maximum HP</label>
+                                <input type="number" class="form-control" name="maxHP">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Current HP</label>
+                                <input type="number" class="form-control" name="currentHP">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Temporary HP</label>
+                                <input type="number" class="form-control" name="tempHP" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="saving-throws-box">
+                        <h4>Saving Throws</h4>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Fortitude</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="fortitudeProf" value="0">
+                                    <input type="number" class="form-control" name="fortitudeItem" value="0">
+                                    <input type="number" class="form-control" name="fortitudeTotal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Reflex</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="reflexProf" value="0">
+                                    <input type="number" class="form-control" name="reflexItem" value="0">
+                                    <input type="number" class="form-control" name="reflexTotal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Will</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="willProf" value="0">
+                                    <input type="number" class="form-control" name="willItem" value="0">
+                                    <input type="number" class="form-control" name="willTotal" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills Tab -->
+        <div class="tab-pane fade" id="skills">
+            <div class="form-section">
+                <h3 class="section-title">Skills</h3>
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Skill</th>
+                                        <th>Ability</th>
+                                        <th>Proficiency</th>
+                                        <th>Item Bonus</th>
+                                        <th>Total</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="skill-name">Acrobatics</td>
+                                        <td class="skill-ability">DEX</td>
+                                        <td>
+                                            <select class="form-select" name="acrobaticsProf">
+                                                <option value="0">Untrained (+0)</option>
+                                                <option value="2">Trained (+2)</option>
+                                                <option value="4">Expert (+4)</option>
+                                                <option value="6">Master (+6)</option>
+                                                <option value="8">Legendary (+8)</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" class="form-control" name="acrobaticsItem" value="0"></td>
+                                        <td><input type="number" class="form-control skill-total" name="acrobaticsTotal" readonly></td>
+                                        <td><input type="text" class="form-control" name="acrobaticsNotes"></td>
+                                    </tr>
+                                    <!-- Pozostałe umiejętności... -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feats & Features Tab -->
+        <div class="tab-pane fade" id="feats">
+            <div class="form-section">
+                <h3 class="section-title">Feats & Features</h3>
+                
+                <!-- Ancestry Feats -->
+                <div class="mb-4">
+                    <h4 class="mb-3">Ancestry Feats</h4>
+                    <div id="ancestryFeatsContainer">
+                        <!-- Template for ancestry feat -->
+                        <div class="feat-template d-none">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control" placeholder="Feat Name" name="ancestryFeatName[]">
+                                        </div>
+                                        <div class="col-md-2 mb-2">
+                                            <input type="number" class="form-control" placeholder="Level" name="ancestryFeatLevel[]" min="1">
+                                        </div>
+                                        <div class="col-md-5 mb-2">
+                                            <textarea class="form-control" placeholder="Description" name="ancestryFeatDesc[]" rows="2"></textarea>
+                                        </div>
+                                        <div class="col-md-1 mb-2 d-flex align-items-center">
+                                            <button type="button" class="btn btn-danger remove-feat"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="addAncestryFeat">Add Ancestry Feat</button>
+                </div>
+
+                <!-- Class Feats -->
+                <div class="mb-4">
+                    <h4 class="mb-3">Class Feats</h4>
+                    <div id="classFeatsContainer">
+                        <!-- Template for class feat -->
+                        <div class="feat-template d-none">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control" placeholder="Feat Name" name="classFeatName[]">
+                                        </div>
+                                        <div class="col-md-2 mb-2">
+                                            <input type="number" class="form-control" placeholder="Level" name="classFeatLevel[]" min="1">
+                                        </div>
+                                        <div class="col-md-5 mb-2">
+                                            <textarea class="form-control" placeholder="Description" name="classFeatDesc[]" rows="2"></textarea>
+                                        </div>
+                                        <div class="col-md-1 mb-2 d-flex align-items-center">
+                                            <button type="button" class="btn btn-danger remove-feat"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="addClassFeat">Add Class Feat</button>
+                </div>
+
+                <!-- Skill Feats -->
+                <div class="mb-4">
+                    <h4 class="mb-3">Skill Feats</h4>
+                    <div id="skillFeatsContainer">
+                        <!-- Template for skill feat -->
+                        <div class="feat-template d-none">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control" placeholder="Feat Name" name="skillFeatName[]">
+                                        </div>
+                                        <div class="col-md-2 mb-2">
+                                            <input type="number" class="form-control" placeholder="Level" name="skillFeatLevel[]" min="1">
+                                        </div>
+                                        <div class="col-md-5 mb-2">
+                                            <textarea class="form-control" placeholder="Description" name="skillFeatDesc[]" rows="2"></textarea>
+                                        </div>
+                                        <div class="col-md-1 mb-2 d-flex align-items-center">
+                                            <button type="button" class="btn btn-danger remove-feat"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="addSkillFeat">Add Skill Feat</button>
+                </div>
+
+                <!-- General Feats -->
+                <div class="mb-4">
+                    <h4 class="mb-3">General Feats</h4>
+                    <div id="generalFeatsContainer">
+                        <!-- Template for general feat -->
+                        <div class="feat-template d-none">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control" placeholder="Feat Name" name="generalFeatName[]">
+                                        </div>
+                                        <div class="col-md-2 mb-2">
+                                            <input type="number" class="form-control" placeholder="Level" name="generalFeatLevel[]" min="1">
+                                        </div>
+                                        <div class="col-md-5 mb-2">
+                                            <textarea class="form-control" placeholder="Description" name="generalFeatDesc[]" rows="2"></textarea>
+                                        </div>
+                                        <div class="col-md-1 mb-2 d-flex align-items-center">
+                                            <button type="button" class="btn btn-danger remove-feat"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="addGeneralFeat">Add General Feat</button>
+                </div>
+
+                <!-- Class Features -->
+                <div class="mb-4">
+                    <h4 class="mb-3">Class Features</h4>
+                    <div id="classFeaturesContainer">
+                        <!-- Template for class feature -->
+                        <div class="feature-template d-none">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control" placeholder="Feature Name" name="classFeatureName[]">
+                                        </div>
+                                        <div class="col-md-2 mb-2">
+                                            <input type="number" class="form-control" placeholder="Level" name="classFeatureLevel[]" min="1">
+                                        </div>
+                                        <div class="col-md-5 mb-2">
+                                            <textarea class="form-control" placeholder="Description" name="classFeatureDesc[]" rows="2"></textarea>
+                                        </div>
+                                        <div class="col-md-1 mb-2 d-flex align-items-center">
+                                            <button type="button" class="btn btn-danger remove-feature"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="addClassFeature">Add Class Feature</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder dla pozostałych zakładek -->
+        <div class="tab-pane fade" id="spells">
+            <!-- Spells content will be added in next update -->
+        </div>
+        <div class="tab-pane fade" id="inventory">
+            <!-- Inventory content will be added in next update -->
+        </div>
+        <div class="tab-pane fade" id="character">
+            <!-- Character content will be added in next update -->
+        </div>
+    </div>
+</form>

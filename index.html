@@ -5,401 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pathfinder 2E Character Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .form-section {
-            margin-bottom: 2rem;
-            padding: 1rem;
-            border: 1px solid #dee2e6;
-            border-radius: 0.25rem;
-        }
-        .section-title {
-            margin-bottom: 1rem;
-            color: #495057;
-        }
-        .input-group .form-control {
-            transition: all 0.3s ease;
-        }
-        .input-group .form-control[readonly] {
-            background-color: #f8f9fa;
-        }
-        .bonus-positive {
-            color: #198754 !important;
-            background-color: #d1e7dd !important;
-            border-color: #badbcc !important;
-            font-weight: 500;
-        }
-        .bonus-negative {
-            color: #dc3545 !important;
-            background-color: #f8d7da !important;
-            border-color: #f5c2c7 !important;
-            font-weight: 500;
-        }
-        .input-group {
-            flex-wrap: nowrap !important;
-        }
-        .input-group .form-control {
-            width: 60px !important;
-            padding: 0.375rem 0.5rem;
-            text-align: center;
-        }
-        .total-ability {
-            background-color: #e9ecef !important;
-            font-weight: bold !important;
-            color: #495057 !important;
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 0.5rem;
-            }
-            .input-group .form-control {
-                width: 45px !important;
-                padding: 0.25rem;
-                font-size: 0.875rem;
-            }
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
 </head>
 <body class="bg-light">
     <div class="container py-4">
-        <h1 class="text-center mb-4">Pathfinder 2E Character Sheet</h1>
-        
-        <div class="d-flex justify-content-end gap-2 mb-3">
-            <button id="saveBtn" class="btn btn-primary">Save Character</button>
-            <button id="loadBtn" class="btn btn-secondary">Load Character</button>
-            <button id="exportBtn" class="btn btn-success">Export to JSON</button>
-            <input type="file" id="importFile" class="d-none" accept=".json">
-            <button id="importBtn" class="btn btn-info">Import from JSON</button>
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="text-center mb-4">Pathfinder 2E Character Manager</h1>
+                <div class="text-center mb-4">
+                    <button type="button" class="btn btn-primary me-2" id="saveBtn">Save Character</button>
+                    <button type="button" class="btn btn-secondary me-2" id="loadBtn">Load Character</button>
+                    <button type="button" class="btn btn-success me-2" id="exportBtn">Export to JSON</button>
+                    <button type="button" class="btn btn-info" id="importBtn">Import from JSON</button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+            </div>
         </div>
 
-        <form id="characterForm">
-            <!-- Basic Information -->
-            <div class="form-section">
-                <h3 class="section-title">Basic Information</h3>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Character Name</label>
-                        <input type="text" class="form-control" name="name" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Player Name</label>
-                        <input type="text" class="form-control" name="playerName">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Ancestry</label>
-                        <select class="form-control" name="ancestry">
-                            <option value="">Select Ancestry</option>
-                            <option value="Dwarf">Dwarf</option>
-                            <option value="Elf">Elf</option>
-                            <option value="Gnome">Gnome</option>
-                            <option value="Goblin">Goblin</option>
-                            <option value="Halfling">Halfling</option>
-                            <option value="Human">Human</option>
-                            <option value="Half-Elf">Half-Elf</option>
-                            <option value="Half-Orc">Half-Orc</option>
-                            <option value="Hobgoblin">Hobgoblin</option>
-                            <option value="Leshy">Leshy</option>
-                            <option value="Lizardfolk">Lizardfolk</option>
-                            <option value="Orc">Orc</option>
-                            <option value="Ratfolk">Ratfolk</option>
-                            <option value="Tengu">Tengu</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Background</label>
-                        <select class="form-control" name="background">
-                            <option value="">Select Background</option>
-                            <option value="Acolyte">Acolyte</option>
-                            <option value="Acrobat">Acrobat</option>
-                            <option value="Animal Whisperer">Animal Whisperer</option>
-                            <option value="Artisan">Artisan</option>
-                            <option value="Artist">Artist</option>
-                            <option value="Barkeep">Barkeep</option>
-                            <option value="Bounty Hunter">Bounty Hunter</option>
-                            <option value="Criminal">Criminal</option>
-                            <option value="Detective">Detective</option>
-                            <option value="Entertainer">Entertainer</option>
-                            <option value="Farmhand">Farmhand</option>
-                            <option value="Gladiator">Gladiator</option>
-                            <option value="Guard">Guard</option>
-                            <option value="Herbalist">Herbalist</option>
-                            <option value="Hermit">Hermit</option>
-                            <option value="Hunter">Hunter</option>
-                            <option value="Laborer">Laborer</option>
-                            <option value="Merchant">Merchant</option>
-                            <option value="Noble">Noble</option>
-                            <option value="Nomad">Nomad</option>
-                            <option value="Scholar">Scholar</option>
-                            <option value="Scout">Scout</option>
-                            <option value="Street Urchin">Street Urchin</option>
-                            <option value="Warrior">Warrior</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Class</label>
-                        <select class="form-control" name="class">
-                            <option value="">Select Class</option>
-                            <option value="Alchemist">Alchemist</option>
-                            <option value="Barbarian">Barbarian</option>
-                            <option value="Bard">Bard</option>
-                            <option value="Champion">Champion</option>
-                            <option value="Cleric">Cleric</option>
-                            <option value="Druid">Druid</option>
-                            <option value="Fighter">Fighter</option>
-                            <option value="Gunslinger">Gunslinger</option>
-                            <option value="Inventor">Inventor</option>
-                            <option value="Investigator">Investigator</option>
-                            <option value="Magus">Magus</option>
-                            <option value="Monk">Monk</option>
-                            <option value="Oracle">Oracle</option>
-                            <option value="Ranger">Ranger</option>
-                            <option value="Rogue">Rogue</option>
-                            <option value="Sorcerer">Sorcerer</option>
-                            <option value="Summoner">Summoner</option>
-                            <option value="Swashbuckler">Swashbuckler</option>
-                            <option value="Witch">Witch</option>
-                            <option value="Wizard">Wizard</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Level</label>
-                        <input type="number" class="form-control" name="level" min="1" max="20" value="1">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Experience Points</label>
-                        <input type="number" class="form-control" name="xp" value="0">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Hero Points</label>
-                        <input type="number" class="form-control" name="heroPoints" min="0" max="3" value="0">
-                    </div>
-                </div>
-            </div>
+        <ul class="nav nav-tabs mb-4" id="characterTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab">Basic Info</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="combat-tab" data-bs-toggle="tab" data-bs-target="#combat" type="button" role="tab">Combat</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills" type="button" role="tab">Skills</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="feats-tab" data-bs-toggle="tab" data-bs-target="#feats" type="button" role="tab">Feats & Features</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="spells-tab" data-bs-toggle="tab" data-bs-target="#spells" type="button" role="tab">Spells</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory" type="button" role="tab">Inventory</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="character-tab" data-bs-toggle="tab" data-bs-target="#character" type="button" role="tab">Character</button>
+            </li>
+        </ul>
 
-            <!-- Ability Scores -->
-            <div class="form-section">
-                <h3 class="section-title">Ability Scores</h3>
-                <div class="row">
-                    <div class="col-md-4 col-6 mb-3">
-                        <label class="form-label">Strength</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control base-ability" name="strength" value="10" data-ability="strength">
-                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="strength" value="0">
-                            <input type="number" class="form-control background-bonus" readonly data-ability="strength" value="0">
-                            <input type="number" class="form-control class-bonus" readonly data-ability="strength" value="0">
-                            <input type="number" class="form-control total-ability" readonly data-ability="strength" value="10">
-                        </div>
-                        <small class="text-muted">Base / Ancestry / Background / Class / Total</small>
-                    </div>
-                    <div class="col-md-4 col-6 mb-3">
-                        <label class="form-label">Dexterity</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control base-ability" name="dexterity" value="10" data-ability="dexterity">
-                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="dexterity" value="0">
-                            <input type="number" class="form-control background-bonus" readonly data-ability="dexterity" value="0">
-                            <input type="number" class="form-control class-bonus" readonly data-ability="dexterity" value="0">
-                            <input type="number" class="form-control total-ability" readonly data-ability="dexterity" value="10">
-                        </div>
-                        <small class="text-muted">Base / Ancestry / Background / Class / Total</small>
-                    </div>
-                    <div class="col-md-4 col-6 mb-3">
-                        <label class="form-label">Constitution</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control base-ability" name="constitution" value="10" data-ability="constitution">
-                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="constitution" value="0">
-                            <input type="number" class="form-control background-bonus" readonly data-ability="constitution" value="0">
-                            <input type="number" class="form-control class-bonus" readonly data-ability="constitution" value="0">
-                            <input type="number" class="form-control total-ability" readonly data-ability="constitution" value="10">
-                        </div>
-                        <small class="text-muted">Base / Ancestry / Background / Class / Total</small>
-                    </div>
-                    <div class="col-md-4 col-6 mb-3">
-                        <label class="form-label">Intelligence</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control base-ability" name="intelligence" value="10" data-ability="intelligence">
-                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="intelligence" value="0">
-                            <input type="number" class="form-control background-bonus" readonly data-ability="intelligence" value="0">
-                            <input type="number" class="form-control class-bonus" readonly data-ability="intelligence" value="0">
-                            <input type="number" class="form-control total-ability" readonly data-ability="intelligence" value="10">
-                        </div>
-                        <small class="text-muted">Base / Ancestry / Background / Class / Total</small>
-                    </div>
-                    <div class="col-md-4 col-6 mb-3">
-                        <label class="form-label">Wisdom</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control base-ability" name="wisdom" value="10" data-ability="wisdom">
-                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="wisdom" value="0">
-                            <input type="number" class="form-control background-bonus" readonly data-ability="wisdom" value="0">
-                            <input type="number" class="form-control class-bonus" readonly data-ability="wisdom" value="0">
-                            <input type="number" class="form-control total-ability" readonly data-ability="wisdom" value="10">
-                        </div>
-                        <small class="text-muted">Base / Ancestry / Background / Class / Total</small>
-                    </div>
-                    <div class="col-md-4 col-6 mb-3">
-                        <label class="form-label">Charisma</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control base-ability" name="charisma" value="10" data-ability="charisma">
-                            <input type="number" class="form-control ancestry-bonus" readonly data-ability="charisma" value="0">
-                            <input type="number" class="form-control background-bonus" readonly data-ability="charisma" value="0">
-                            <input type="number" class="form-control class-bonus" readonly data-ability="charisma" value="0">
-                            <input type="number" class="form-control total-ability" readonly data-ability="charisma" value="10">
-                        </div>
-                        <small class="text-muted">Base / Ancestry / Background / Class / Total</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Health and Defenses -->
-            <div class="form-section">
-                <h3 class="section-title">Health and Defenses</h3>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Maximum HP</label>
-                        <input type="number" class="form-control" name="maxHp" value="0">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Current HP</label>
-                        <input type="number" class="form-control" name="currentHp" value="0">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Temporary HP</label>
-                        <input type="number" class="form-control" name="tempHp" value="0">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Armor Class</label>
-                        <input type="number" class="form-control" name="ac" value="10">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Shield Bonus</label>
-                        <input type="number" class="form-control" name="shieldBonus" value="0">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Saving Throws -->
-            <div class="form-section">
-                <h3 class="section-title">Saving Throws</h3>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Fortitude</label>
-                        <input type="number" class="form-control" name="fortitude" value="0">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Reflex</label>
-                        <input type="number" class="form-control" name="reflex" value="0">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Will</label>
-                        <input type="number" class="form-control" name="will" value="0">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Skills -->
-            <div class="form-section">
-                <h3 class="section-title">Skills</h3>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Acrobatics</label>
-                        <input type="number" class="form-control" name="acrobatics" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Arcana</label>
-                        <input type="number" class="form-control" name="arcana" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Athletics</label>
-                        <input type="number" class="form-control" name="athletics" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Crafting</label>
-                        <input type="number" class="form-control" name="crafting" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Deception</label>
-                        <input type="number" class="form-control" name="deception" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Diplomacy</label>
-                        <input type="number" class="form-control" name="diplomacy" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Intimidation</label>
-                        <input type="number" class="form-control" name="intimidation" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Medicine</label>
-                        <input type="number" class="form-control" name="medicine" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Nature</label>
-                        <input type="number" class="form-control" name="nature" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Occultism</label>
-                        <input type="number" class="form-control" name="occultism" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Performance</label>
-                        <input type="number" class="form-control" name="performance" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Religion</label>
-                        <input type="number" class="form-control" name="religion" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Society</label>
-                        <input type="number" class="form-control" name="society" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Stealth</label>
-                        <input type="number" class="form-control" name="stealth" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Survival</label>
-                        <input type="number" class="form-control" name="survival" value="0">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Thievery</label>
-                        <input type="number" class="form-control" name="thievery" value="0">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Inventory -->
-            <div class="form-section">
-                <h3 class="section-title">Inventory</h3>
-                <div class="mb-3">
-                    <label class="form-label">Equipment</label>
-                    <textarea class="form-control" name="equipment" rows="4"></textarea>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Copper Pieces</label>
-                        <input type="number" class="form-control" name="cp" value="0">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Silver Pieces</label>
-                        <input type="number" class="form-control" name="sp" value="0">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Gold Pieces</label>
-                        <input type="number" class="form-control" name="gp" value="0">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notes -->
-            <div class="form-section">
-                <h3 class="section-title">Notes</h3>
-                <div class="mb-3">
-                    <label class="form-label">Character Notes</label>
-                    <textarea class="form-control" name="notes" rows="4"></textarea>
-                </div>
-            </div>
-        </form>
+        <form id="characterForm">{{ ... }}</form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
