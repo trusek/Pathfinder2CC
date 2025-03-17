@@ -34,6 +34,14 @@ export class CharacterCalculator {
         strikeInputs.forEach(input => {
             input.addEventListener('change', () => this.calculateStrikes());
         });
+
+        // Listener for traits change
+        const traitsElement = this.form.querySelector('[name="traits"]');
+        if (traitsElement) {
+            traitsElement.addEventListener('change', () => {
+                this.updateTraitsDisplay();
+            });
+        }
     }
 
     updateAbilityScores() {
@@ -125,22 +133,28 @@ export class CharacterCalculator {
         });
 
         // Update traits display
-        const traits = [];
-        if (ancestry) traits.push(ancestry);
-        if (background) traits.push(background);
-        if (characterClass) traits.push(characterClass);
-        
-        const traitsElement = document.getElementById('selectedTraits');
-        if (traitsElement) {
-            traitsElement.textContent = traits.join(', ') || 'None';
+        const traitsElement = document.querySelector('[name="traits"]');
+        const selectedTraits = Array.from(traitsElement.selectedOptions).map(option => option.text).join(', ');
+        const traitsDisplay = document.getElementById('selectedTraits');
+        if (traitsDisplay) {
+            traitsDisplay.textContent = selectedTraits || 'None';
         }
-
+ 
         // Update dependent calculations only if we're under the limit
         this.calculateAC();
         this.calculateSavingThrows();
         this.calculateSkills();
         this.calculateClassDC();
         this.calculateStrikes();
+    }
+
+    updateTraitsDisplay() {
+        const traitsElement = this.form.querySelector('[name="traits"]');
+        const selectedTraits = Array.from(traitsElement.selectedOptions).map(option => option.text).join(', ');
+        const traitsDisplay = document.getElementById('selectedTraits');
+        if (traitsDisplay) {
+            traitsDisplay.textContent = selectedTraits || 'None';
+        }
     }
 
     calculateAC() {
@@ -376,5 +390,24 @@ export class CharacterCalculator {
             wizard: { intelligence: 2 }
         };
         return bonuses[characterClass] || {};
+    }
+
+    saveCharacter() {
+        // ... existing save logic
+
+        // Save selected traits
+        const traitsElement = this.form.querySelector('[name="traits"]');
+        const selectedTraits = Array.from(traitsElement.options)
+            .filter(option => option.selected)
+            .map(option => option.value);
+        character.traits = selectedTraits;
+
+        // Save inventory items
+        const inventoryItems = this.form.querySelectorAll('[name="inventory_items"]');
+        character.inventory = Array.from(inventoryItems)
+            .map(item => item.value)
+            .filter(value => value); // Ensure we only save non-empty values
+
+        // ... continue saving other character data
     }
 }
