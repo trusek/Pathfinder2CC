@@ -20,80 +20,86 @@ export class CharacterCalculator {
             this.calculateSavingThrows();
             this.calculateSkills();
         });
+
+        // Skill proficiency and item bonus listeners
+        const skillInputs = document.querySelectorAll('[name$="Proficiency"], [name$="ItemBonus"]');
+        skillInputs?.forEach(input => {
+            input?.addEventListener('change', () => this.calculateSkills());
+        });
     }
 
     getAncestryBonuses(ancestry) {
         const bonuses = {
-            'Dwarf': { constitution: 2, wisdom: 2, charisma: -2 },
-            'Elf': { dexterity: 2, intelligence: 2, constitution: -2 },
-            'Gnome': { constitution: 2, charisma: 2, strength: -2 },
-            'Goblin': { dexterity: 2, charisma: 2, wisdom: -2 },
-            'Halfling': { dexterity: 2, wisdom: 2, strength: -2 },
-            'Human': { strength: 2 },
-            'Half-Elf': { dexterity: 2 },
-            'Half-Orc': { strength: 2 },
-            'Hobgoblin': { constitution: 2 },
-            'Leshy': { constitution: 2, wisdom: 2, intelligence: -2 },
-            'Lizardfolk': { strength: 2, wisdom: 2, intelligence: -2 },
-            'Orc': { strength: 2, constitution: 2, intelligence: -2 },
-            'Ratfolk': { dexterity: 2, intelligence: 2, strength: -2 },
-            'Tengu': { dexterity: 2, charisma: 2, constitution: -2 }
+            'dwarf': { constitution: 2, wisdom: 2, charisma: -2 },
+            'elf': { dexterity: 2, intelligence: 2, constitution: -2 },
+            'gnome': { constitution: 2, charisma: 2, strength: -2 },
+            'goblin': { dexterity: 2, charisma: 2, wisdom: -2 },
+            'halfling': { dexterity: 2, wisdom: 2, strength: -2 },
+            'human': { strength: 2 },
+            'half-elf': { dexterity: 2 },
+            'half-orc': { strength: 2 },
+            'hobgoblin': { constitution: 2 },
+            'lesh': { constitution: 2, wisdom: 2, intelligence: -2 },
+            'lizardfolk': { strength: 2, wisdom: 2, intelligence: -2 },
+            'orc': { strength: 2, constitution: 2, intelligence: -2 },
+            'ratfolk': { dexterity: 2, intelligence: 2, strength: -2 },
+            'tengu': { dexterity: 2, charisma: 2, constitution: -2 }
         };
         return bonuses[ancestry] || {};
     }
 
     getBackgroundBonuses(background) {
         const bonuses = {
-            'Acolyte': { wisdom: 2, intelligence: 2 },
-            'Acrobat': { dexterity: 2, charisma: 2 },
-            'Animal Whisperer': { wisdom: 2, charisma: 2 },
-            'Artisan': { strength: 2, intelligence: 2 },
-            'Artist': { dexterity: 2, charisma: 2 },
-            'Barkeep': { constitution: 2, charisma: 2 },
-            'Bounty Hunter': { strength: 2, wisdom: 2 },
-            'Criminal': { dexterity: 2, intelligence: 2 },
-            'Detective': { intelligence: 2, wisdom: 2 },
-            'Entertainer': { dexterity: 2, charisma: 2 },
-            'Farmhand': { constitution: 2, wisdom: 2 },
-            'Gladiator': { strength: 2, charisma: 2 },
-            'Guard': { strength: 2, charisma: 2 },
-            'Herbalist': { constitution: 2, wisdom: 2 },
-            'Hermit': { constitution: 2, intelligence: 2 },
-            'Hunter': { dexterity: 2, wisdom: 2 },
-            'Laborer': { strength: 2, constitution: 2 },
-            'Merchant': { intelligence: 2, charisma: 2 },
-            'Noble': { intelligence: 2, charisma: 2 },
-            'Nomad': { constitution: 2, wisdom: 2 },
-            'Scholar': { intelligence: 2, wisdom: 2 },
-            'Scout': { dexterity: 2, wisdom: 2 },
-            'Street Urchin': { dexterity: 2, constitution: 2 },
-            'Warrior': { strength: 2, constitution: 2 }
+            'acolyte': { wisdom: 2, intelligence: 2 },
+            'acrobat': { dexterity: 2, charisma: 2 },
+            'animal whisperer': { wisdom: 2, charisma: 2 },
+            'artisan': { strength: 2, intelligence: 2 },
+            'artist': { dexterity: 2, charisma: 2 },
+            'barkeep': { constitution: 2, charisma: 2 },
+            'bounty hunter': { strength: 2, wisdom: 2 },
+            'criminal': { dexterity: 2, intelligence: 2 },
+            'detective': { intelligence: 2, wisdom: 2 },
+            'entertainer': { dexterity: 2, charisma: 2 },
+            'farmhand': { constitution: 2, wisdom: 2 },
+            'gladiator': { strength: 2, charisma: 2 },
+            'guard': { strength: 2, charisma: 2 },
+            'herbalist': { constitution: 2, wisdom: 2 },
+            'hermit': { constitution: 2, intelligence: 2 },
+            'hunter': { dexterity: 2, wisdom: 2 },
+            'laborer': { strength: 2, constitution: 2 },
+            'merchant': { intelligence: 2, charisma: 2 },
+            'noble': { intelligence: 2, charisma: 2 },
+            'nomad': { constitution: 2, wisdom: 2 },
+            'scholar': { intelligence: 2, wisdom: 2 },
+            'scout': { dexterity: 2, wisdom: 2 },
+            'street urchin': { dexterity: 2, constitution: 2 },
+            'warrior': { strength: 2, constitution: 2 }
         };
         return bonuses[background] || {};
     }
 
     getClassBonuses(characterClass) {
         const bonuses = {
-            'Alchemist': { intelligence: 2 },
-            'Barbarian': { strength: 2 },
-            'Bard': { charisma: 2 },
-            'Champion': { strength: 2 },
-            'Cleric': { wisdom: 2 },
-            'Druid': { wisdom: 2 },
-            'Fighter': { strength: 2 },
-            'Gunslinger': { dexterity: 2 },
-            'Inventor': { intelligence: 2 },
-            'Investigator': { intelligence: 2 },
-            'Magus': { intelligence: 2 },
-            'Monk': { dexterity: 2 },
-            'Oracle': { charisma: 2 },
-            'Ranger': { dexterity: 2 },
-            'Rogue': { dexterity: 2 },
-            'Sorcerer': { charisma: 2 },
-            'Summoner': { charisma: 2 },
-            'Swashbuckler': { dexterity: 2 },
-            'Witch': { intelligence: 2 },
-            'Wizard': { intelligence: 2 }
+            'alchemist': { intelligence: 2 },
+            'barbarian': { strength: 2 },
+            'bard': { charisma: 2 },
+            'champion': { strength: 2 },
+            'cleric': { wisdom: 2 },
+            'druid': { wisdom: 2 },
+            'fighter': { strength: 2 },
+            'gunslinger': { dexterity: 2 },
+            'inventor': { intelligence: 2 },
+            'investigator': { intelligence: 2 },
+            'magus': { intelligence: 2 },
+            'monk': { dexterity: 2 },
+            'oracle': { charisma: 2 },
+            'ranger': { dexterity: 2 },
+            'rogue': { dexterity: 2 },
+            'sorcerer': { charisma: 2 },
+            'summoner': { charisma: 2 },
+            'swashbuckler': { dexterity: 2 },
+            'witch': { intelligence: 2 },
+            'wizard': { intelligence: 2 }
         };
         return bonuses[characterClass] || {};
     }
@@ -195,14 +201,21 @@ export class CharacterCalculator {
         };
 
         Object.entries(skills).forEach(([skill, ability]) => {
-            const profValue = parseInt(document.querySelector(`[name="${skill}Prof"]`)?.value) || 0;
-            const itemBonus = parseInt(document.querySelector(`[name="${skill}Item"]`)?.value) || 0;
-            const abilityMod = Math.floor((parseInt(document.querySelector(`[data-ability="${ability}"].total-ability`)?.value) - 10) / 2);
+            const profValue = parseInt(document.querySelector(`[name="${skill}Proficiency"]`)?.value) || 0;
+            const itemBonus = parseInt(document.querySelector(`[name="${skill}ItemBonus"]`)?.value) || 0;
+            const abilityScore = parseInt(document.querySelector(`[data-ability="${ability}"].total-ability`)?.value) || 10;
+            const abilityMod = Math.floor((abilityScore - 10) / 2);
             
-            const total = profValue + itemBonus + abilityMod + level;
+            // Update ability modifier display
+            const abilityModInput = document.querySelector(`[name="${skill}AbilityMod"]`);
+            if (abilityModInput) {
+                abilityModInput.value = abilityMod;
+            }
+            
+            // Update total
             const totalInput = document.querySelector(`[name="${skill}Total"]`);
             if (totalInput) {
-                totalInput.value = total;
+                totalInput.value = profValue + itemBonus + abilityMod + level;
             }
         });
     }
