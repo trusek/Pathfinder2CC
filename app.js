@@ -1,4 +1,4 @@
-import { basicInfoTemplate, combatTemplate, skillsTemplate, featsTemplate } from './templates.js';
+import { basicInfoTemplate, combatTemplate, skillsTemplate, featsTemplate, characterTemplate } from './templates/index.js';
 import { FormHandler } from './formHandlers.js';
 import { CharacterCalculator } from './calculations.js';
 import { FeatsHandler } from './featsHandler.js';
@@ -13,14 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${combatTemplate}
                 ${skillsTemplate}
                 ${featsTemplate}
+                ${characterTemplate}
                 <div class="tab-pane fade" id="spells">
                     <!-- Spells content will be added in next update -->
                 </div>
                 <div class="tab-pane fade" id="inventory">
                     <!-- Inventory content will be added in next update -->
-                </div>
-                <div class="tab-pane fade" id="character">
-                    <!-- Character content will be added in next update -->
                 </div>
             </div>
         `;
@@ -169,24 +167,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Add event listeners for ability score changes
-    document.querySelectorAll('.base-ability').forEach(input => {
-        input.addEventListener('change', () => calculator.updateAbilityScores());
-    });
-
-    // Add event listeners for AC changes
-    document.querySelectorAll('[name="baseAC"], [name="dexCap"], [name="acItemBonus"]').forEach(input => {
-        input.addEventListener('change', () => calculator.calculateAC());
-    });
-
-    // Add event listener for level changes
-    const levelInput = document.querySelector('[name="level"]');
-    if (levelInput) {
-        levelInput.addEventListener('change', () => {
-            calculator.calculateSavingThrows();
-            calculator.calculateSkills();
-        });
-    }
+    // Setup event listeners after form is loaded
+    setTimeout(() => {
+        calculator.setupEventListeners();
+        featsHandler.setupEventListeners();
+    }, 0);
 
     // Add event listeners for ancestry, background, and class changes
     const ancestrySelect = document.querySelector('[name="ancestry"]');
