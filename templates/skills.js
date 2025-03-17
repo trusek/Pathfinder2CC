@@ -145,4 +145,64 @@ export const skillsTemplate = `
                 </tbody>
             </table>
         </div>
-    </div>`;
+
+        <!-- Sekcja Lore Skills -->
+        <div class="row mb-3">
+            <div class="col">
+                <h3>Lore Skills</h3>
+                <div id="loreSkillsContainer">
+                    <!-- Tutaj będą dodawane dynamicznie umiejętności Lore -->
+                </div>
+                <button type="button" class="btn btn-primary mt-2" id="addLoreSkill" onclick="addLoreSkill()">Add Lore Skill</button>
+            </div>
+        </div>
+    </div>
+`;
+
+export function addLoreSkill() {
+    const container = document.getElementById('loreSkillsContainer');
+    const loreSkills = container.getElementsByClassName('lore-skill');
+    
+    if (loreSkills.length >= 2) {
+        alert('You can only add up to 2 Lore skills.');
+        return;
+    }
+
+    const newSkillId = loreSkills.length + 1;
+    const newSkillHtml = `
+        <div class="lore-skill mb-2">
+            <div class="row">
+                <div class="col-3">
+                    <input type="text" class="form-control form-control-sm" name="lore${newSkillId}_name" placeholder="Lore Name">
+                </div>
+                <div class="col-2">
+                    <input type="number" class="form-control form-control-sm" name="lore${newSkillId}_mod" readonly>
+                </div>
+                <div class="col-2">
+                    <select class="form-control form-control-sm" name="lore${newSkillId}_prof">
+                        <option value="0">-</option>
+                        <option value="2">T</option>
+                        <option value="4">E</option>
+                        <option value="6">M</option>
+                        <option value="8">L</option>
+                    </select>
+                </div>
+                <div class="col-2">
+                    <input type="number" class="form-control form-control-sm" name="lore${newSkillId}_item" value="0">
+                </div>
+                <div class="col-2">
+                    <input type="number" class="form-control form-control-sm" name="lore${newSkillId}_total" readonly>
+                </div>
+                <div class="col-1">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeLoreSkill(this)">X</button>
+                </div>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', newSkillHtml);
+}
+
+export function removeLoreSkill(button) {
+    const skillElement = button.closest('.lore-skill');
+    skillElement.remove();
+}

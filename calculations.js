@@ -1,186 +1,105 @@
 export class CharacterCalculator {
-    constructor() {
-        // Nie ustawiamy event listenerów w konstruktorze
+    constructor(form) {
+        this.form = form;
+        this.setupEventListeners();
     }
 
     setupEventListeners() {
-        // Ability score event listeners
-        document.querySelectorAll('.base-ability')?.forEach(input => {
-            input?.addEventListener('change', () => this.updateAbilityScores());
+        // Ability score listeners
+        const abilityInputs = this.form.querySelectorAll('[name$="_score"], [name$="_bonus"]');
+        abilityInputs.forEach(input => {
+            input.addEventListener('change', () => this.updateAbilityScores());
         });
 
-        // AC event listeners
-        document.querySelectorAll('[name="baseAC"], [name="dexCap"], [name="acItemBonus"]')?.forEach(input => {
-            input?.addEventListener('change', () => this.calculateAC());
+        // AC listeners
+        const acInputs = this.form.querySelectorAll('[name="ac_prof"], [name="ac_item"]');
+        acInputs.forEach(input => {
+            input.addEventListener('change', () => this.calculateAC());
         });
 
-        // Level change listener
-        const levelInput = document.querySelector('[name="level"]');
-        levelInput?.addEventListener('change', () => {
-            this.calculateSavingThrows();
-            this.calculateSkills();
+        // Saving throw listeners
+        const saveInputs = this.form.querySelectorAll('[name$="_save_prof"], [name$="_save_item"]');
+        saveInputs.forEach(input => {
+            input.addEventListener('change', () => this.calculateSavingThrows());
         });
 
-        // Skill proficiency and item bonus listeners
-        const skillInputs = document.querySelectorAll('[name$="Proficiency"], [name$="ItemBonus"]');
-        skillInputs?.forEach(input => {
-            input?.addEventListener('change', () => this.calculateSkills());
+        // Class DC listeners
+        const dcInputs = this.form.querySelectorAll('[name="classDcKeyAbility"], [name="classDcProf"], [name="classDcItem"]');
+        dcInputs.forEach(input => {
+            input.addEventListener('change', () => this.calculateClassDC());
         });
-    }
 
-    getAncestryBonuses(ancestry) {
-        const bonuses = {
-            'dwarf': { constitution: 2, wisdom: 2, charisma: -2 },
-            'elf': { dexterity: 2, intelligence: 2, constitution: -2 },
-            'gnome': { constitution: 2, charisma: 2, strength: -2 },
-            'goblin': { dexterity: 2, charisma: 2, wisdom: -2 },
-            'halfling': { dexterity: 2, wisdom: 2, strength: -2 },
-            'human': { strength: 2 },
-            'half-elf': { dexterity: 2 },
-            'half-orc': { strength: 2 },
-            'hobgoblin': { constitution: 2 },
-            'lesh': { constitution: 2, wisdom: 2, intelligence: -2 },
-            'lizardfolk': { strength: 2, wisdom: 2, intelligence: -2 },
-            'orc': { strength: 2, constitution: 2, intelligence: -2 },
-            'ratfolk': { dexterity: 2, intelligence: 2, strength: -2 },
-            'tengu': { dexterity: 2, charisma: 2, constitution: -2 }
-        };
-        return bonuses[ancestry] || {};
-    }
-
-    getBackgroundBonuses(background) {
-        const bonuses = {
-            'acolyte': { wisdom: 2, intelligence: 2 },
-            'acrobat': { dexterity: 2, charisma: 2 },
-            'animal whisperer': { wisdom: 2, charisma: 2 },
-            'artisan': { strength: 2, intelligence: 2 },
-            'artist': { dexterity: 2, charisma: 2 },
-            'barkeep': { constitution: 2, charisma: 2 },
-            'bounty hunter': { strength: 2, wisdom: 2 },
-            'criminal': { dexterity: 2, intelligence: 2 },
-            'detective': { intelligence: 2, wisdom: 2 },
-            'entertainer': { dexterity: 2, charisma: 2 },
-            'farmhand': { constitution: 2, wisdom: 2 },
-            'gladiator': { strength: 2, charisma: 2 },
-            'guard': { strength: 2, charisma: 2 },
-            'herbalist': { constitution: 2, wisdom: 2 },
-            'hermit': { constitution: 2, intelligence: 2 },
-            'hunter': { dexterity: 2, wisdom: 2 },
-            'laborer': { strength: 2, constitution: 2 },
-            'merchant': { intelligence: 2, charisma: 2 },
-            'noble': { intelligence: 2, charisma: 2 },
-            'nomad': { constitution: 2, wisdom: 2 },
-            'scholar': { intelligence: 2, wisdom: 2 },
-            'scout': { dexterity: 2, wisdom: 2 },
-            'street urchin': { dexterity: 2, constitution: 2 },
-            'warrior': { strength: 2, constitution: 2 }
-        };
-        return bonuses[background] || {};
-    }
-
-    getClassBonuses(characterClass) {
-        const bonuses = {
-            'alchemist': { intelligence: 2 },
-            'barbarian': { strength: 2 },
-            'bard': { charisma: 2 },
-            'champion': { strength: 2 },
-            'cleric': { wisdom: 2 },
-            'druid': { wisdom: 2 },
-            'fighter': { strength: 2 },
-            'gunslinger': { dexterity: 2 },
-            'inventor': { intelligence: 2 },
-            'investigator': { intelligence: 2 },
-            'magus': { intelligence: 2 },
-            'monk': { dexterity: 2 },
-            'oracle': { charisma: 2 },
-            'ranger': { dexterity: 2 },
-            'rogue': { dexterity: 2 },
-            'sorcerer': { charisma: 2 },
-            'summoner': { charisma: 2 },
-            'swashbuckler': { dexterity: 2 },
-            'witch': { intelligence: 2 },
-            'wizard': { intelligence: 2 }
-        };
-        return bonuses[characterClass] || {};
+        // Strike listeners
+        const strikeInputs = this.form.querySelectorAll('.melee-strike input, .melee-strike select, .ranged-strike input, .ranged-strike select');
+        strikeInputs.forEach(input => {
+            input.addEventListener('change', () => this.calculateStrikes());
+        });
     }
 
     updateAbilityScores() {
         const abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
         
         abilities.forEach(ability => {
-            const baseInput = document.querySelector(`[name="${ability}"]`);
-            const totalInput = document.querySelector(`[data-ability="${ability}"].total-ability`);
+            const score = parseInt(this.form.querySelector(`[name="${ability}_score"]`)?.value) || 10;
+            const bonus = parseInt(this.form.querySelector(`[name="${ability}_bonus"]`)?.value) || 0;
+            const total = score + bonus;
+            const mod = Math.floor((total - 10) / 2);
             
-            if (baseInput && totalInput) {
-                const base = parseInt(baseInput.value) || 10;
-                const ancestryBonus = parseInt(document.querySelector(`[data-ability="${ability}"].ancestry-bonus`)?.value) || 0;
-                const backgroundBonus = parseInt(document.querySelector(`[data-ability="${ability}"].background-bonus`)?.value) || 0;
-                const classBonus = parseInt(document.querySelector(`[data-ability="${ability}"].class-bonus`)?.value) || 0;
-                
-                const total = base + ancestryBonus + backgroundBonus + classBonus;
-                totalInput.value = total;
-                
-                // Update modifier display
-                const modifier = Math.floor((total - 10) / 2);
-                const modifierClass = modifier >= 0 ? 'bonus-positive' : 'bonus-negative';
-                totalInput.classList.remove('bonus-positive', 'bonus-negative');
-                totalInput.classList.add(modifierClass);
+            if (this.form.querySelector(`[name="${ability}_mod"]`)) {
+                this.form.querySelector(`[name="${ability}_mod"]`).value = mod;
             }
         });
 
+        // Update dependent calculations
         this.calculateAC();
         this.calculateSavingThrows();
         this.calculateSkills();
+        this.calculateClassDC();
+        this.calculateStrikes();
     }
 
     calculateAC() {
-        const baseAC = parseInt(document.querySelector('[name="baseAC"]')?.value) || 10;
-        const dexCap = parseInt(document.querySelector('[name="dexCap"]')?.value) || 0;
-        const itemBonus = parseInt(document.querySelector('[name="acItemBonus"]')?.value) || 0;
+        const dexMod = parseInt(this.form.querySelector('[name="dexterity_mod"]')?.value) || 0;
+        const prof = parseInt(this.form.querySelector('[name="ac_prof"]')?.value) || 0;
+        const item = parseInt(this.form.querySelector('[name="ac_item"]')?.value) || 0;
+        const level = parseInt(this.form.querySelector('[name="level"]')?.value) || 0;
+
+        const total = 10 + dexMod + (prof > 0 ? level + prof : 0) + item;
         
-        const dexMod = parseInt(document.querySelector('[data-ability="dexterity"].total-ability')?.value) || 0;
-        const effectiveDexMod = dexCap > 0 ? Math.min(dexMod, dexCap) : dexMod;
-        
-        const totalAC = baseAC + effectiveDexMod + itemBonus;
-        const totalACInput = document.querySelector('[name="totalAC"]');
-        if (totalACInput) {
-            totalACInput.value = totalAC;
+        if (this.form.querySelector('[name="ac_dex"]')) {
+            this.form.querySelector('[name="ac_dex"]').value = dexMod;
+        }
+        if (this.form.querySelector('[name="ac_total"]')) {
+            this.form.querySelector('[name="ac_total"]').value = total;
         }
     }
 
     calculateSavingThrows() {
-        const level = parseInt(document.querySelector('[name="level"]')?.value) || 0;
-        
-        // Calculate Fortitude save
-        const conMod = Math.floor((parseInt(document.querySelector('[data-ability="constitution"].total-ability')?.value) - 10) / 2);
-        const fortProf = parseInt(document.querySelector('[name="fortitudeProf"]')?.value) || 0;
-        const fortItem = parseInt(document.querySelector('[name="fortitudeItem"]')?.value) || 0;
-        const fortTotal = document.querySelector('[name="fortitudeTotal"]');
-        if (fortTotal) {
-            fortTotal.value = fortProf + fortItem + conMod + level;
-        }
-        
-        // Calculate Reflex save
-        const dexMod = Math.floor((parseInt(document.querySelector('[data-ability="dexterity"].total-ability')?.value) - 10) / 2);
-        const reflexProf = parseInt(document.querySelector('[name="reflexProf"]')?.value) || 0;
-        const reflexItem = parseInt(document.querySelector('[name="reflexItem"]')?.value) || 0;
-        const reflexTotal = document.querySelector('[name="reflexTotal"]');
-        if (reflexTotal) {
-            reflexTotal.value = reflexProf + reflexItem + dexMod + level;
-        }
-        
-        // Calculate Will save
-        const wisMod = Math.floor((parseInt(document.querySelector('[data-ability="wisdom"].total-ability')?.value) - 10) / 2);
-        const willProf = parseInt(document.querySelector('[name="willProf"]')?.value) || 0;
-        const willItem = parseInt(document.querySelector('[name="willItem"]')?.value) || 0;
-        const willTotal = document.querySelector('[name="willTotal"]');
-        if (willTotal) {
-            willTotal.value = willProf + willItem + wisMod + level;
+        const saves = {
+            fortitude: 'constitution',
+            reflex: 'dexterity',
+            will: 'wisdom'
+        };
+
+        const level = parseInt(this.form.querySelector('[name="level"]')?.value) || 0;
+
+        for (const [save, ability] of Object.entries(saves)) {
+            const abilityMod = parseInt(this.form.querySelector(`[name="${ability}_mod"]`)?.value) || 0;
+            const prof = parseInt(this.form.querySelector(`[name="${save}_save_prof"]`)?.value) || 0;
+            const item = parseInt(this.form.querySelector(`[name="${save}_save_item"]`)?.value) || 0;
+
+            const total = abilityMod + (prof > 0 ? level + prof : 0) + item;
+            
+            if (this.form.querySelector(`[name="${save}_save_mod"]`)) {
+                this.form.querySelector(`[name="${save}_save_mod"]`).value = abilityMod;
+            }
+            if (this.form.querySelector(`[name="${save}_save_total"]`)) {
+                this.form.querySelector(`[name="${save}_save_total"]`).value = total;
+            }
         }
     }
 
     calculateSkills() {
-        const level = parseInt(document.querySelector('[name="level"]')?.value) || 0;
         const skills = {
             acrobatics: 'dexterity',
             arcana: 'intelligence',
@@ -200,23 +119,147 @@ export class CharacterCalculator {
             thievery: 'dexterity'
         };
 
-        Object.entries(skills).forEach(([skill, ability]) => {
-            const profValue = parseInt(document.querySelector(`[name="${skill}Proficiency"]`)?.value) || 0;
-            const itemBonus = parseInt(document.querySelector(`[name="${skill}ItemBonus"]`)?.value) || 0;
-            const abilityScore = parseInt(document.querySelector(`[data-ability="${ability}"].total-ability`)?.value) || 10;
-            const abilityMod = Math.floor((abilityScore - 10) / 2);
+        const level = parseInt(this.form.querySelector('[name="level"]')?.value) || 0;
+
+        for (const [skill, ability] of Object.entries(skills)) {
+            const abilityMod = parseInt(this.form.querySelector(`[name="${ability}_mod"]`)?.value) || 0;
+            const prof = parseInt(this.form.querySelector(`[name="${skill}_prof"]`)?.value) || 0;
+            const item = parseInt(this.form.querySelector(`[name="${skill}_item"]`)?.value) || 0;
+
+            const total = abilityMod + (prof > 0 ? level + prof : 0) + item;
             
-            // Update ability modifier display
-            const abilityModInput = document.querySelector(`[name="${skill}AbilityMod"]`);
-            if (abilityModInput) {
-                abilityModInput.value = abilityMod;
+            if (this.form.querySelector(`[name="${skill}_mod"]`)) {
+                this.form.querySelector(`[name="${skill}_mod"]`).value = abilityMod;
             }
+            if (this.form.querySelector(`[name="${skill}_total"]`)) {
+                this.form.querySelector(`[name="${skill}_total"]`).value = total;
+            }
+        }
+
+        // Calculate Lore skills
+        const loreSkills = this.form.querySelectorAll('.lore-skill');
+        loreSkills.forEach((skill, index) => {
+            const id = index === 0 ? '' : `_${index + 1}`;
+            const abilityMod = parseInt(this.form.querySelector('[name="intelligence_mod"]')?.value) || 0;
+            const prof = parseInt(skill.querySelector(`[name="lore${id}_prof"]`)?.value) || 0;
+            const item = parseInt(skill.querySelector(`[name="lore${id}_item"]`)?.value) || 0;
+
+            const total = abilityMod + (prof > 0 ? level + prof : 0) + item;
             
-            // Update total
-            const totalInput = document.querySelector(`[name="${skill}Total"]`);
-            if (totalInput) {
-                totalInput.value = profValue + itemBonus + abilityMod + level;
+            if (skill.querySelector(`[name="lore${id}_mod"]`)) {
+                skill.querySelector(`[name="lore${id}_mod"]`).value = abilityMod;
+            }
+            if (skill.querySelector(`[name="lore${id}_total"]`)) {
+                skill.querySelector(`[name="lore${id}_total"]`).value = total;
             }
         });
+    }
+
+    calculateClassDC() {
+        const keyAbility = this.form.querySelector('[name="classDcKeyAbility"]')?.value || 'charisma';
+        const abilityMod = parseInt(this.form.querySelector(`[name="${keyAbility}_mod"]`)?.value) || 0;
+        const prof = parseInt(this.form.querySelector('[name="classDcProf"]')?.value) || 0;
+        const item = parseInt(this.form.querySelector('[name="classDcItem"]')?.value) || 0;
+        const level = parseInt(this.form.querySelector('[name="level"]')?.value) || 0;
+
+        const total = 10 + abilityMod + (prof > 0 ? level + prof : 0) + item;
+        
+        if (this.form.querySelector('[name="classDcTotal"]')) {
+            this.form.querySelector('[name="classDcTotal"]').value = total;
+        }
+    }
+
+    calculateStrikes() {
+        const level = parseInt(this.form.querySelector('[name="level"]')?.value) || 0;
+        const strMod = parseInt(this.form.querySelector('[name="strength_mod"]')?.value) || 0;
+        const dexMod = parseInt(this.form.querySelector('[name="dexterity_mod"]')?.value) || 0;
+
+        // Calculate melee strikes
+        const meleeStrikes = this.form.querySelectorAll('.melee-strike');
+        meleeStrikes.forEach((strike, index) => {
+            const id = index === 0 ? '' : `_${index + 1}`;
+            
+            if (strike.querySelector(`[name="meleeStr${id}"]`)) {
+                strike.querySelector(`[name="meleeStr${id}"]`).value = strMod;
+            }
+            if (strike.querySelector(`[name="meleeStrDmg${id}"]`)) {
+                strike.querySelector(`[name="meleeStrDmg${id}"]`).value = strMod;
+            }
+            
+            const prof = parseInt(strike.querySelector(`[name="meleeProf${id}"]`)?.value) || 0;
+            const item = parseInt(strike.querySelector(`[name="meleeItem${id}"]`)?.value) || 0;
+            const total = strMod + (prof > 0 ? level + prof : 0) + item;
+            
+            if (strike.querySelector(`[name="meleeTotal${id}"]`)) {
+                strike.querySelector(`[name="meleeTotal${id}"]`).value = total;
+            }
+        });
+
+        // Calculate ranged strikes
+        const rangedStrikes = this.form.querySelectorAll('.ranged-strike');
+        rangedStrikes.forEach((strike, index) => {
+            const id = index === 0 ? '' : `_${index + 1}`;
+            
+            if (strike.querySelector(`[name="rangedDex${id}"]`)) {
+                strike.querySelector(`[name="rangedDex${id}"]`).value = dexMod;
+            }
+            
+            const prof = parseInt(strike.querySelector(`[name="rangedProf${id}"]`)?.value) || 0;
+            const item = parseInt(strike.querySelector(`[name="rangedItem${id}"]`)?.value) || 0;
+            const total = dexMod + (prof > 0 ? level + prof : 0) + item;
+            
+            if (strike.querySelector(`[name="rangedTotal${id}"]`)) {
+                strike.querySelector(`[name="rangedTotal${id}"]`).value = total;
+            }
+        });
+    }
+
+    getAncestryBonuses(ancestry) {
+        console.log('Getting ancestry bonuses for:', ancestry);
+        const bonuses = {
+            dwarf: { constitution: 2, wisdom: 2, charisma: -2 },
+            elf: { dexterity: 2, intelligence: 2, constitution: -2 },
+            gnome: { constitution: 2, charisma: 2, strength: -2 },
+            goblin: { dexterity: 2, charisma: 2, wisdom: -2 },
+            halfling: { dexterity: 2, wisdom: 2, strength: -2 },
+            human: { strength: 2 }
+        };
+        return bonuses[ancestry] || {};
+    }
+
+    getBackgroundBonuses(background) {
+        console.log('Getting background bonuses for:', background);
+        const bonuses = {
+            acolyte: { intelligence: 2, wisdom: 2 },
+            artisan: { strength: 2, intelligence: 2 },
+            entertainer: { dexterity: 2, charisma: 2 },
+            laborer: { strength: 2, constitution: 2 },
+            merchant: { intelligence: 2, charisma: 2 },
+            noble: { intelligence: 2, charisma: 2 },
+            nomad: { constitution: 2, wisdom: 2 },
+            scholar: { intelligence: 2, wisdom: 2 },
+            scout: { dexterity: 2, wisdom: 2 },
+            warrior: { strength: 2, constitution: 2 }
+        };
+        return bonuses[background] || {};
+    }
+
+    getClassBonuses(characterClass) {
+        console.log('Getting class bonuses for:', characterClass);
+        const bonuses = {
+            alchemist: { intelligence: 2 },
+            barbarian: { strength: 2 },
+            bard: { charisma: 2 },
+            champion: { strength: 2 },
+            cleric: { wisdom: 2 },
+            druid: { wisdom: 2 },
+            fighter: { strength: 2 },
+            monk: { dexterity: 2 },
+            ranger: { dexterity: 2 },
+            rogue: { dexterity: 2 },
+            sorcerer: { charisma: 2 },
+            wizard: { intelligence: 2 }
+        };
+        return bonuses[characterClass] || {};
     }
 }

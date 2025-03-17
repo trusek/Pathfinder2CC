@@ -6,28 +6,30 @@ import { SpellsHandler } from './spellsHandler.js';
 import { InventoryHandler } from './inventoryHandler.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM Content Loaded');
+    console.log('DOM fully loaded');
     
-    // Initialize form content
-    const characterForm = document.getElementById('characterForm');
-    if (characterForm) {
-        console.log('Found character form, initializing content');
-        characterForm.innerHTML = `
-            <div class="tab-content">
-                ${basicInfoTemplate}
-                ${combatTemplate}
-                ${skillsTemplate}
-                ${featsTemplate}
-                ${characterTemplate}
-                ${spellsTemplate}
-                ${inventoryTemplate}
-            </div>
-        `;
+    const form = document.getElementById('characterForm');
+    if (!form) {
+        console.error('Character form not found!');
+        return;
     }
+
+    // Initialize form content
+    form.innerHTML = `
+        <div class="tab-content">
+            ${basicInfoTemplate}
+            ${combatTemplate}
+            ${skillsTemplate}
+            ${featsTemplate}
+            ${characterTemplate}
+            ${spellsTemplate}
+            ${inventoryTemplate}
+        </div>
+    `;
 
     // Initialize handlers
     const formHandler = new FormHandler();
-    const calculator = new CharacterCalculator();
+    const calculator = new CharacterCalculator(form);
     const featsHandler = new FeatsHandler();
     const spellsHandler = new SpellsHandler();
     const inventoryHandler = new InventoryHandler();
@@ -80,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Load basic data
             Object.entries(characterData).forEach(([name, value]) => {
-                const input = characterForm.querySelector(`[name="${name}"]`);
+                const input = form.querySelector(`[name="${name}"]`);
                 if (input) {
                     input.value = value;
                     // Trigger change event for select elements to update bonuses
@@ -118,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to reset character data
     const resetCharacterData = () => {
         // Reset form inputs
-        const inputs = characterForm.querySelectorAll('input, select, textarea');
+        const inputs = form.querySelectorAll('input, select, textarea');
         inputs.forEach(input => {
             if (input.type === 'number') {
                 input.value = input.min || '0';
@@ -155,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Save character data
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
-            const formData = new FormData(characterForm);
+            const formData = new FormData(form);
             const characterData = Object.fromEntries(formData.entries());
             const featsData = featsHandler.getFeatsData();
             const spellsData = spellsHandler.getSpellsData();
@@ -180,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Export character data
     if (exportBtn) {
         exportBtn.addEventListener('click', () => {
-            const formData = new FormData(characterForm);
+            const formData = new FormData(form);
             const characterData = Object.fromEntries(formData.entries());
             const featsData = featsHandler.getFeatsData();
             const spellsData = spellsHandler.getSpellsData();
@@ -215,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         // Load basic data
                         Object.entries(characterData).forEach(([name, value]) => {
-                            const input = characterForm.querySelector(`[name="${name}"]`);
+                            const input = form.querySelector(`[name="${name}"]`);
                             if (input) {
                                 input.value = value;
                                 // Trigger change event for select elements to update bonuses
@@ -332,6 +334,127 @@ document.addEventListener('DOMContentLoaded', () => {
                     calculator.updateAbilityScores();
                 }
             });
+        }
+
+        window.calculator = calculator;
+
+        // Funkcje do obsługi ataków wręcz i dystansowych
+        window.addMeleeStrike = () => {
+            const meleeStrikes = document.getElementById('meleeStrikes');
+            const strikeTemplate = meleeStrikes.querySelector('.melee-strike').cloneNode(true);
+            
+            // Aktualizuj ID i nazwy pól
+            const strikeCount = meleeStrikes.children.length;
+            const newId = strikeCount + 1;
+            
+            strikeTemplate.querySelectorAll('input, select').forEach(input => {
+                const oldName = input.getAttribute('name');
+                if (oldName) {
+                    input.setAttribute('name', `${oldName}_${newId}`);
+                }
+            });
+            
+            // Dodaj przycisk usuwania
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'btn btn-danger mt-2';
+            deleteButton.textContent = 'Delete Strike';
+            deleteButton.onclick = () => strikeTemplate.remove();
+            strikeTemplate.appendChild(deleteButton);
+            
+            meleeStrikes.appendChild(strikeTemplate);
+        };
+
+        window.addRangedStrike = () => {
+            const rangedStrikes = document.getElementById('rangedStrikes');
+            const strikeTemplate = rangedStrikes.querySelector('.ranged-strike').cloneNode(true);
+            
+            // Aktualizuj ID i nazwy pól
+            const strikeCount = rangedStrikes.children.length;
+            const newId = strikeCount + 1;
+            
+            strikeTemplate.querySelectorAll('input, select').forEach(input => {
+                const oldName = input.getAttribute('name');
+                if (oldName) {
+                    input.setAttribute('name', `${oldName}_${newId}`);
+                }
+            });
+            
+            // Dodaj przycisk usuwania
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'btn btn-danger mt-2';
+            deleteButton.textContent = 'Delete Strike';
+            deleteButton.onclick = () => strikeTemplate.remove();
+            strikeTemplate.appendChild(deleteButton);
+            
+            rangedStrikes.appendChild(strikeTemplate);
+        };
+
+        document.getElementById('addMeleeStrike')?.addEventListener('click', window.addMeleeStrike);
+        document.getElementById('addRangedStrike')?.addEventListener('click', window.addRangedStrike);
+
+        // Dodaj funkcje dla Lore Skills do globalnego zakresu
+        const addLoreSkill = () => {
+            const loreContainer = document.getElementById('loreSkillsContainer');
+            const existingLores = loreContainer.querySelectorAll('.lore-skill').length;
+            
+            if (existingLores < 2) {
+                const newLoreId = existingLores + 1;
+                const newLoreRow = document.createElement('div');
+                newLoreRow.className = 'row mb-2 lore-skill';
+                newLoreRow.id = `customLore${newLoreId}`;
+                
+                newLoreRow.innerHTML = `
+                    <div class="col-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="lore${newLoreId}_name" placeholder="Custom Lore">
+                            <button class="btn btn-danger" type="button" onclick="removeLoreSkill(${newLoreId})">×</button>
+                        </div>
+                    </div>
+                    <div class="col-1">
+                        <input type="text" class="form-control" name="lore${newLoreId}_mod" readonly>
+                    </div>
+                    <div class="col-1">
+                        <select class="form-control proficiency-select" name="lore${newLoreId}_prof">
+                            <option value="0">U</option>
+                            <option value="2">T</option>
+                            <option value="4">E</option>
+                            <option value="6">M</option>
+                            <option value="8">L</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <input type="number" class="form-control item-bonus" name="lore${newLoreId}_item" value="0">
+                    </div>
+                    <div class="col-1">
+                        <input type="text" class="form-control skill-total" name="lore${newLoreId}_total" readonly>
+                    </div>
+                `;
+                
+                loreContainer.appendChild(newLoreRow);
+
+                // Add event listeners for the new skill
+                const profSelect = newLoreRow.querySelector('.proficiency-select');
+                const itemInput = newLoreRow.querySelector('.item-bonus');
+                
+                profSelect.addEventListener('change', () => window.calculator.calculateSkills());
+                itemInput.addEventListener('change', () => window.calculator.calculateSkills());
+            }
+        };
+
+        const removeLoreSkill = (id) => {
+            const loreRow = document.getElementById(`customLore${id}`);
+            if (loreRow) {
+                loreRow.remove();
+                window.calculator.calculateSkills();
+            }
+        };
+
+        window.addLoreSkill = addLoreSkill;
+        window.removeLoreSkill = removeLoreSkill;
+
+        const addLoreBtn = document.getElementById('addLoreSkill');
+        if (addLoreBtn) {
+            addLoreBtn.addEventListener('click', window.addLoreSkill);
         }
 
         // Load last saved character data

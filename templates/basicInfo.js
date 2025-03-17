@@ -87,11 +87,94 @@ export const basicInfoTemplate = `
                 </div>
                 <div class="col-md-3 mb-3">
                     <label class="form-label">Traits</label>
-                    <input type="text" class="form-control" name="traits" placeholder="e.g., Human, Humanoid">
+                    <select class="form-control" name="traits" multiple>
+                        <option value="aberration">Aberration</option>
+                        <option value="aeon">Aeon</option>
+                        <option value="air">Air</option>
+                        <option value="amphibious">Amphibious</option>
+                        <option value="angel">Angel</option>
+                        <option value="aquatic">Aquatic</option>
+                        <option value="archon">Archon</option>
+                        <option value="azata">Azata</option>
+                        <option value="beast">Beast</option>
+                        <option value="celestial">Celestial</option>
+                        <option value="cold">Cold</option>
+                        <option value="construct">Construct</option>
+                        <option value="daemon">Daemon</option>
+                        <option value="demon">Demon</option>
+                        <option value="devil">Devil</option>
+                        <option value="dragon">Dragon</option>
+                        <option value="earth">Earth</option>
+                        <option value="elemental">Elemental</option>
+                        <option value="ethereal">Ethereal</option>
+                        <option value="evil">Evil</option>
+                        <option value="fey">Fey</option>
+                        <option value="fire">Fire</option>
+                        <option value="fiend">Fiend</option>
+                        <option value="fungus">Fungus</option>
+                        <option value="giant">Giant</option>
+                        <option value="good">Good</option>
+                        <option value="humanoid">Humanoid</option>
+                        <option value="incorporeal">Incorporeal</option>
+                        <option value="lawful">Lawful</option>
+                        <option value="monitor">Monitor</option>
+                        <option value="mortal">Mortal</option>
+                        <option value="negative">Negative</option>
+                        <option value="ooze">Ooze</option>
+                        <option value="plant">Plant</option>
+                        <option value="positive">Positive</option>
+                        <option value="protean">Protean</option>
+                        <option value="psychopomp">Psychopomp</option>
+                        <option value="shadow">Shadow</option>
+                        <option value="spirit">Spirit</option>
+                        <option value="swarm">Swarm</option>
+                        <option value="undead">Undead</option>
+                        <option value="water">Water</option>
+                    </select>
+                    <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple traits</small>
                 </div>
                 <div class="col-md-3 mb-3">
                     <label class="form-label">Deity</label>
-                    <input type="text" class="form-control" name="deity">
+                    <select class="form-control" name="deity">
+                        <option value="">Select Deity</option>
+                        <optgroup label="Core Deities">
+                            <option value="abadar">Abadar (LN) - Cities, Law, Wealth</option>
+                            <option value="asmodeus">Asmodeus (LE) - Contracts, Pride, Tyranny</option>
+                            <option value="calistria">Calistria (CN) - Lust, Revenge, Trickery</option>
+                            <option value="cayden">Cayden Cailean (CG) - Ale, Freedom, Wine</option>
+                            <option value="desna">Desna (CG) - Dreams, Luck, Stars, Travel</option>
+                            <option value="erastil">Erastil (LG) - Family, Farming, Hunting</option>
+                            <option value="gorum">Gorum (CN) - Battle, Strength, War</option>
+                            <option value="gozreh">Gozreh (N) - Nature, Sea, Weather</option>
+                            <option value="iomedae">Iomedae (LG) - Honor, Justice, Valor</option>
+                            <option value="irori">Irori (LN) - History, Knowledge, Self-Perfection</option>
+                            <option value="lamashtu">Lamashtu (CE) - Madness, Monsters, Nightmares</option>
+                            <option value="nethys">Nethys (N) - Magic</option>
+                            <option value="norgorber">Norgorber (NE) - Greed, Murder, Secrets</option>
+                            <option value="pharasma">Pharasma (N) - Birth, Death, Fate, Prophecy</option>
+                            <option value="rovagug">Rovagug (CE) - Destruction, Disaster, Wrath</option>
+                            <option value="sarenrae">Sarenrae (NG) - Healing, Honesty, Sun</option>
+                            <option value="shelyn">Shelyn (NG) - Art, Beauty, Love, Music</option>
+                            <option value="torag">Torag (LG) - Forge, Protection, Strategy</option>
+                            <option value="urgathoa">Urgathoa (NE) - Disease, Gluttony, Undeath</option>
+                            <option value="zon-kuthon">Zon-Kuthon (LE) - Darkness, Envy, Loss, Pain</option>
+                        </optgroup>
+                        <optgroup label="Other Deities">
+                            <option value="achaekek">Achaekek (LE) - Assassination, Law</option>
+                            <option value="alseta">Alseta (LN) - Doors, Portals, Transitions</option>
+                            <option value="apsu">Apsu (LG) - Dragons, Honor, Scales</option>
+                            <option value="aroden">Aroden (Dead) - Human Culture, Innovation</option>
+                            <option value="besmara">Besmara (CN) - Piracy, Strife</option>
+                            <option value="brigh">Brigh (N) - Invention</option>
+                            <option value="dahak">Dahak (CE) - Destruction, Dragons</option>
+                            <option value="ghlaunder">Ghlaunder (CE) - Infection, Parasites</option>
+                            <option value="groetus">Groetus (CN) - Empty Places, Ruins</option>
+                            <option value="kurgess">Kurgess (NG) - Competition, Sport</option>
+                            <option value="milani">Milani (CG) - Hope, Uprisings</option>
+                            <option value="sivanah">Sivanah (N) - Illusions, Reflections</option>
+                        </optgroup>
+                        <option value="atheist">Atheist/No Deity</option>
+                    </select>
                 </div>
             </div>
 
@@ -179,4 +262,5 @@ export const basicInfoTemplate = `
                 </div>
             </div>
         </div>
-    </div>`;
+    </div>
+`;
